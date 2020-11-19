@@ -2,6 +2,6 @@
 
 ---
 
-    [x] Reading CPUID  
-    [ ] Basic Array class + ops 
-    [ ] Vectorization, e.t.c
+- [x] Reading CPUID  
+- [ ] Basic Array class + ops 
+- [ ] Vectorization, e.t.c
