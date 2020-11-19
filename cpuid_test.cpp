@@ -3,12 +3,9 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
-
 int main(int argc, char *argv[]) {
     
     auto regs = cpuid(0);
-    string vendor;
     
     auto leaves = getProcLeaves();
     std::cout << "Leaf: " << leaves.first << " / "
