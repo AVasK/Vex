@@ -1,26 +1,11 @@
-/*
- *  Written by AVasK
- *  CPUID subset extraction
- *
- */
-
 #pragma once
-
-#if !(__x86_64__ || __i386__ || __amd64__)
-#error this header is for x86 only
-#endif
 
 #include <array>
 #include <string>
 #include <sstream>
-#include <thread>
 
-#include "OS.hpp"
-
-#if defined(MAC_OS)
-    #include <cpuid.h>
-#endif
-
+#include <cstdint>
+#include <climits>
 
 // UInt:
 template <int N>
@@ -51,6 +36,7 @@ template <int N>
 using UInt = typename USizedInt<N>::type;
 
 
+// Registers
 struct Registers {
 
     UInt<32> EAX = 0;
@@ -84,37 +70,19 @@ struct Registers {
 };
 
 
-static inline auto cpuid(unsigned i) -> Registers
+auto cpuid(unsigned i) -> Registers
 {
     Registers regs;
     
-#if (defined(MAC_OS) && defined(__cpuid))
-    __cpuid(i, regs.EAX, regs.EBX, regs.ECX, regs.EDX);
-    return regs;
-#else
-    
     #ifdef _WIN32
     __cpuid((int *)regs, (int)i);
-    
-    // -- NOT TOTALLY SURE ABOUT THIS --
-    #elif defined(__i386__) && defined(__PIC__)
-    asm volatile (
-                  "pushl %%ebx\n"\
-                  "cpuid\n"\
-                  "mov %%ebx, %1\n"
-                  "popl %%ebx"\
-                  : "=a" (regs[0]), "=r" (regs[1]), "=c" (regs[2]), "=d" (regs[3]) \
-                  : "a" (i), "c" (0)
-                  );
-    // -- -- --
-    
+
     #else
     asm volatile
       ("cpuid" : "=a" (regs[0]), "=b" (regs[1]), "=c" (regs[2]), "=d" (regs[3])
        : "a" (i), "c" (0));
     // ECX is set to zero for CPUID function 4
     #endif
-#endif
     
     return regs;
 }
@@ -230,51 +198,8 @@ auto L2CacheData() -> std::string
     std::ostringstream s;
     s << "L2 Cache:\n"
       << "Line size (B)   : " <<( data.ECX & 0xff )<< "\n"
-      << "Assoc. Type     : " <<( (data.ECX >> 12) & 0x07 )<< "x\n"
+      << "Assoc. Type     : " <<( (data.ECX >> 12) & 0x05 )<< "-way associative\n"
       << "Cache Size (KB) :" <<( (data.ECX >> 16) & 0xffff )<< "\n";
     
     return s.str();
-}
-
-/*
- This doesn't work with recent Intel processors,
- if this functionality will be of any use,
- this func should probably be re-written
- (also to support AMDs, need to check vendor &
-   read from the other offset)
- */
-auto CPUNumCores() -> int
-{
-    // CPUID.4.EAX[31:26] + 1
-    auto regs = cpuid(4);
-    auto EAX = regs.EAX;
-    
-    auto num_cores = ((EAX & (0b111111<<26)) >> 26) + 1;
-    return num_cores;
-}
-
-/*
- For the same reason as for CPUNumCores,
- decided to use std::thread's functionality for now
- */
-auto CPUNumThreads() -> int
-{
-    /*
-    // CPUID.1.EBX[23:16]
-    auto regs = cpuid(1);
-    auto EBX = regs.EBX;
-    
-    auto num_threads = ((EBX & (0b11111111<<16)) >> 16);
-    return num_threads;
-     */
-    
-    return std::thread::hardware_concurrency();
-}
-
-/*
- OS detection in "OS.hpp"
- */
-auto getOS() -> std::string
-{
-    return std::string(OS);
 }
