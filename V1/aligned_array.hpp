@@ -1,3 +1,5 @@
+#pragma once
+
 #include "aligned_memalloc.hpp"
 #include <cstddef> // size_t
 #include <cstring> // memcpy
@@ -164,6 +166,7 @@ public:
         auto reg_size = alignment;
         auto per_register = reg_size/sizeof(T);
         auto n_registers = capacity/reg_size;
+        auto masking = true;
         
         for (int i=0; i<capacity; i++)
         {
@@ -171,7 +174,10 @@ public:
             {
                 oss << "| ";
             }
-            oss << data[i] << " ";
+            if (masking && i < used)
+                oss << data[i] << " ";
+            else
+                oss << "# ";
         }
         oss << "\n";
         return oss.str();

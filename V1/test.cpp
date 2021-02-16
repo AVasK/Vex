@@ -1,6 +1,7 @@
 #include "cctools.hpp"
 #include <iostream>
 #include "aligned_array.hpp"
+#include "vex.hpp"
 
 int main() {
     
@@ -27,6 +28,10 @@ int main() {
         
     std::cout << a << "\n" << b << "\n" << c << "\n" << d << "\n" << e << "\n";
     
+    
+    auto v = Array<int16_t>(14, 0); // 14 ints
+    auto w = Array<double>(14, 0); // 14 doubles
+    std::cout << v << "\n" << w << "\n";
     
     /*
      Interface Prototyping:
