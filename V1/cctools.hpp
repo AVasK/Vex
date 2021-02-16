@@ -83,3 +83,4 @@
 // returns -> 11, 14, 17, 20, e.t.c
 #define CPP_V ((__cplusplus/10000 > 19)?\
 ((__cplusplus/100) % 100): 0)
+

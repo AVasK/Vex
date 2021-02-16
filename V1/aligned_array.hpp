@@ -9,35 +9,26 @@
 
 #define func auto
 
-/*
+
 // The Contiguous memory has the granularity of
 // the underlying MMX | XMM | YMM | ZMM registers (== alignment)
-// => all memory allocations should be of size: size % align == 0
-template <size_t block_size>
-constexpr func modsize(size_t n) -> size_t;
+// register (XMM|YMM|whatever) = [_|_|_|_] can contain reg_size/sizeof(T) elements
+// of type T
+// => since the memory class should map directly to registers,
+// [_|_|_|_][_|_|_|_] (cannot add incomplete register: [_|])
 
-// size: size >= n && size % 16 == 0
-template<>
-inline
-constexpr func modsize<16>(size_t n) -> size_t
+// Computes the blocksize such that
+// blocksize is evenly divisible by the #of_elements of type T
+// that fit into the XMM|YMM|ZMM register size (reg.size = in bytes to alignment)
+template <typename T>
+static inline func blocksize(size_t n, size_t reg_size) -> size_t
 {
-    return ((n>>4)+1)<<4;
+    auto per_register = reg_size / sizeof(T);
+    //return ((n / per_register) + 1) * per_register;
+    return ceil((float)n / per_register) * per_register;
 }
 
-template<>
-inline
-constexpr func modsize<32>(size_t n) -> size_t
-{
-    return ((n>>5)+1)<<5;
-}
 
-template<>
-inline
-constexpr func modsize<64>(size_t n) -> size_t
-{
-    return ((n>>6)+1)<<6;
-}
- */
 
 
 // TODO: Add .what at least
@@ -46,7 +37,10 @@ struct MemoryException {};
 
 /// Contiguous memory of type T
 /// aligned @ <align>-byte boundary
-template <typename T, size_t align=16>
+/// NOTE: Since the alignment is chosen given the CPUID info
+///       @ runtime => "align" shouldn't be a template parameter
+///       but rather fed into the C'tor.
+template <typename T>
 class Contiguous {
 public:
     
@@ -54,39 +48,29 @@ public:
     
     // given just the block_size,
     // we only set the capacity.
-    Contiguous(size_t size)
-    : capacity {size}
+    Contiguous(size_t size, size_t align)
+    : capacity {blocksize<T>( size, align )}
     , used {0}
-    , data {aligned::alloc<T>( size, align )}
-    {
-        if (!data) {
-            throw MemoryException {};
-        }
-    }
-    
-    Contiguous(size_t size, T fill_value)
-    : capacity {size}
-    , used {size}
-    , data {aligned::alloc<T>( size, align )}
-    {
-        if (!data) {
-            throw MemoryException {};
-        }
-        for (size_t i=0; i<capacity; ++i)
-        {
-            data[i] = fill_value;
-        }
-    }
-    
-    Contiguous(std::initializer_list<T> list)
-    : capacity {list.size()}
-    , used {capacity}
+    , alignment {align}
     , data {aligned::alloc<T>( capacity, align )}
     {
-        size_t i = 0;
-        for (auto elem : list)
+        if (!data) {
+            throw MemoryException {};
+        }
+    }
+    
+    Contiguous(size_t size, T fill_value, size_t align)
+    : capacity {blocksize<T>( size, align )}
+    , used {size}
+    , alignment {align}
+    , data {aligned::alloc<T>( capacity, align )}
+    {
+        if (!data) {
+            throw MemoryException {};
+        }
+        for (size_t i=0; i<used; ++i)
         {
-            data[i++] = elem;
+            data[i] = fill_value;
         }
     }
     
@@ -99,7 +83,8 @@ public:
     Contiguous(Contiguous const& other)
     : capacity {other.capacity}
     , used {other.used}
-    , data {aligned::alloc<T>( capacity, align )}
+    , alignment {other.alignment}
+    , data {aligned::alloc<T>( capacity, alignment )}
     {
         if (!data)
         {
@@ -115,7 +100,8 @@ public:
     {
         capacity = other.capacity;
         used = other.used;
-        data = aligned::alloc<T>( capacity, align );
+        alignment = other.alignment;
+        data = aligned::alloc<T>( capacity, alignment );
         if (!data)
         {
             throw MemoryException {};
@@ -131,6 +117,7 @@ public:
     Contiguous(Contiguous && other)
     : capacity {other.capacity}
     , used {other.used}
+    , alignment {other.alignment}
     , data {other.data}
     {
         other.used = 0;
@@ -142,6 +129,7 @@ public:
     {
         capacity = other.capacity;
         used = other.used;
+        alignment = other.alignment;
         data = other.data;
         
         other.used = 0;
@@ -167,24 +155,23 @@ public:
             << "| @ % 16    " <<(long)data%16<< "\n"
             << "| @ % 32    " <<(long)data%32<< "\n"
             << "| @ % 64    " <<(long)data%64<< "\n"
+            << "| sizeof(T)=" << sizeof(T)   << "\n"
+            << "| reg_size =" << alignment   << "\n"
+            << "| elems/reg " << alignment/sizeof(T) << "\n"
+            << "| # regs    " << capacity*sizeof(T)/alignment << "\n"
             << "*--------------------------------\n";
-        oss << "[";
         
-        auto end = capacity-1;
-        for (size_t i = 0; i < end; ++i)
+        auto reg_size = alignment;
+        auto per_register = reg_size/sizeof(T);
+        auto n_registers = capacity/reg_size;
+        
+        for (int i=0; i<capacity; i++)
         {
-            if (i < used) {
-                oss << data[i] << ", ";
+            if (i && i % per_register == 0)
+            {
+                oss << "| ";
             }
-            else {
-                oss << "_, ";
-            }
-        }
-        if (end < used) {
-            oss << data[end] << "]";
-        }
-        else {
-            oss << "_]";
+            oss << data[i] << " ";
         }
         oss << "\n";
         return oss.str();
@@ -194,13 +181,14 @@ public:
     
     
 private:
+    size_t alignment = 16;
     size_t capacity = 0;
     size_t used = 0;
     T* data = nullptr;
 };
 
-template <typename T, size_t align>
-std::ostream& operator<<(std::ostream& os, Contiguous<T, align> const& mem)
+template <typename T>
+std::ostream& operator<<(std::ostream& os, Contiguous<T> const& mem)
 {
     os << mem.toString();
     return os;

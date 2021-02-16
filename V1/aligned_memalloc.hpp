@@ -1,3 +1,4 @@
+#pragma once
 #include "intrinsics.hpp" // _mm_malloc, _mm_free
 #include <cstddef> // size_t
 #define func auto
