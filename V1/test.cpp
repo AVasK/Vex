@@ -3,6 +3,11 @@
 #include "aligned_array.hpp"
 #include "vex.hpp"
 
+#include "timing.hpp"
+#include <vector>
+
+#include "x86_cpuid.hpp"
+
 int main() {
     
 /*
@@ -18,7 +23,7 @@ int main() {
     if (CPP_V >= 11) {
         std::cout << "...";
     }
-*/
+
     
     Contiguous<int> a(11, 16);
     Contiguous<long> b(17, 7, 32);
@@ -26,12 +31,43 @@ int main() {
     auto d = std::move(a);
     auto e = Contiguous<int16_t>(17, 1, 8);
         
-    std::cout << a << "\n" << b << "\n" << c << "\n" << d << "\n" << e << "\n";
+    //std::cout << a << "\n" << b << "\n" << c << "\n" << d << "\n" << e << "\n";
+*/
+    
+    auto N = 10000000;
+    
+    int x, y;
+    std::cout << "Enter x y:\n";
+    std::cin >> x;
+    std::cin >> y;
+    
+    auto v = Array<int16_t>(N, x); // [1] * 14
+    auto w = Array<int16_t>(N, y); // [3] * 14
+    
+    {
+        auto t = timing::nsTimer("SIMD");
+        auto z = v + w; // SIMD?
+    }
+    
+    auto vv = std::vector<int16_t> (N, x);
+    auto vw = std::vector<int16_t> (N, y);
     
     
-    auto v = Array<int16_t>(14, 0); // 14 ints
-    auto w = Array<double>(14, 0); // 14 doubles
-    std::cout << v << "\n" << w << "\n";
+    {
+        auto t = timing::nsTimer("loop");
+        auto zv = std::vector<int16_t> (N);
+        for (size_t i=0; i<vv.size(); ++i) {
+            zv[i] = vv[i] + vw[i];
+        }
+    }
+    
+    
+    
+    
+     
+    //std::cout << v << "\n" << w << "\n" << z << "\n";
+    
+    
     
     /*
      Interface Prototyping:

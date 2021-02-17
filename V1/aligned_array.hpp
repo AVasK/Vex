@@ -48,11 +48,10 @@ public:
     
     // C'tors & stuff
     
-    // given just the block_size,
-    // we only set the capacity.
+    // no initialization (for temporaries)
     Contiguous(size_t size, size_t align)
     : capacity {blocksize<T>( size, align )}
-    , used {0}
+    , used {size}
     , alignment {align}
     , data {aligned::alloc<T>( capacity, align )}
     {
@@ -143,7 +142,31 @@ public:
     
     // Memory-management
     
+    func size() const -> size_t {
+        return used;
+    }
+    
     // Addressing
+    func operator[] (size_t idx) -> T&
+    {
+        //if ((unsigned)idx <= used)
+            return data[idx];
+        //else
+        //    throw MemoryException {};
+    }
+    
+    func operator[] (size_t idx) const -> const T&
+    {
+        //if ((unsigned)idx <= used)
+            return data[idx];
+        //else
+        //    throw MemoryException {};
+    }
+    
+    func size_in_registers() const -> size_t
+    {
+        return capacity*sizeof(T)/alignment;
+    }
     
     // toString
     func toString() const -> std::string

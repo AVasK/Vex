@@ -87,7 +87,6 @@ inline auto cpuid(unsigned i) -> Registers
              : "a" (i), "c" (0));
     // ECX is set to zero for CPUID function 4
     #endif
-#endif
     
     return regs;
 }
