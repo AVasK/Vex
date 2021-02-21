@@ -1,98 +1,107 @@
+#pragma once
+
 #include "aligned_array.hpp"
+#include "integers.hpp"
 
-//TODO: Use cpuid + check needed SIMD instr.set to get needed alignment
-size_t get_alignment() { return 16; }
+#define func auto
 
+//FIXME: Use cpuid + check needed SIMD instr.set to get needed alignment
+size_t dummy_alignment() { return 32; }
+
+// FORWARD DECLARATION
 template <typename T>
 class Array;
 
+// FORWARD DECLARED FRIEND FUNCS
 template <typename T>
 Array<T> operator+ (Array<T> const& a1, Array<T> const& a2);
 
 
+// ARRAY class
 template <typename T>
 class Array {
+    
+    // Aliases:
+    using UnaryF  = Array<T> (*) (Array<T> const&);
+    
+    using BinaryF = Array<T> (*) (
+                                  Array<T> & dest,
+                                  Array<T> const&,
+                                  Array<T> const&
+                                 );
+    
 public:
+    // C'tors
     Array(size_t size)
-    : alignment {get_alignment()}
-    , memory(size, alignment)
-    {}
+    : memory (size, dummy_alignment())
+    {
+        set_func_handlers();
+    }
     
     Array(size_t size, T fill_value)
-    : alignment {get_alignment()}
-    , memory(size, fill_value, alignment)
-    {}
+    : memory(size, fill_value, dummy_alignment())
+    {
+        set_func_handlers();
+    }
     
-    auto operator[] (size_t idx) -> T&
+    // Memory Addressing
+    
+    func get_alignment() const -> size_t
+    {
+        return memory.get_alignment();
+    }
+    
+    func size_in_registers() const -> size_t
+    {
+        return memory.size_in_registers();
+    }
+    
+    func operator[] (size_t idx) -> T&
     {
         return memory[idx];
     }
     
-    auto operator[] (size_t idx) const -> const T&
+    func operator[] (size_t idx) const -> const T&
     {
         return memory[idx];
     }
     
-    std::string toStream() const {
+    // Size & Memory Management
+    func toStream() const -> std::string
+    {
         return memory.toString();
     }
     
-    size_t size() const {
+    func size() const -> size_t
+    {
         return memory.size();
     }
     
-    friend auto operator+<T> (Array const& a1, Array const& a2) -> Array;
+    // Arithmetics:
+    func operator+= (Array const& other) -> Array&;
+    func operator*= (Array const& other) -> Array&;
+    
+    
+    // Friend Binary Ops
+    friend func operator+<T> (Array const& a1, Array const& a2) -> Array;
+    
+protected:
+    Contiguous<T> memory;
     
 private:
-    size_t alignment;
-    Contiguous<T> memory;
+    BinaryF f_add;
+    BinaryF f_sub;
+    UnaryF f_iadd;
+    UnaryF f_isub;
+    
+    void set_func_handlers();
 };
 
-using I16 = int16_t;
 
-static inline auto LoadVector(void const * p) -> __m128i
-{
-    // load aligned integer vector from array p
-    return _mm_load_si128((__m128i const*) p);
-}
+// Intrinsic wrappers lie in another file to avoid clutter...
+#include "intrin_funcs.hh"
 
-static inline auto StoreVector(void * d, __m128i const& x) -> void
-{
-    // store aligned integer vector x into array d
-    _mm_store_si128((__m128i *) d, x);
-}
+// Definitions:
+#include "vex.hh"
 
-
-template <typename T>
-Array<T> operator+ (Array<T> const& a1, Array<T> const& a2)
-{}
-
-template <>
-Array<I16> operator+ (Array<I16> const& a1, Array<I16> const& a2)
-{
-    auto n_regs = a1.memory.size_in_registers();
-    Array<I16> res (a1.size());
-    for (size_t i=0; i<n_regs; ++i)
-    {
-        // load 8 consecutive elements from a1:
-        __m128i _a1 = LoadVector(&a1[8*i]);
-        //FIXME: Need separate function to get register start address.
-        
-        // load 8 cons.elems from a2
-        __m128i _a2 = LoadVector(&a2[8*i]);
-        
-        // vadds _a1, _a2
-        __m128i _res = _mm_adds_epi16(_a1, _a2);
-        
-        // store the resulting 8 elements in res:
-        StoreVector(&res[8*i], _res);
-    }
-    return res;
-}
-
-template <typename T>
-std::ostream& operator<< (std::ostream& os, Array<T> const& arr)
-{
-    os << arr.toStream();
-    return os;
-}
+#undef func

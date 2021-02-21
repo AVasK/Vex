@@ -4,9 +4,20 @@
 #include "vex.hpp"
 
 #include "timing.hpp"
+#include <valarray>
 #include <vector>
+#include <cstdlib> // rng
 
 #include "x86_cpuid.hpp"
+
+template <typename T>
+void rand_init(T & array_like, size_t N)
+{
+    for (size_t i=0; i<N; i++)
+    {
+        array_like[i] = std::rand();
+    }
+}
 
 int main() {
     
@@ -34,34 +45,48 @@ int main() {
     //std::cout << a << "\n" << b << "\n" << c << "\n" << d << "\n" << e << "\n";
 */
     
-    auto N = 10000000;
+    auto N = 20;
+    int s = 0;
+    std::srand(std::time(nullptr));
+        
     
-    int x, y;
-    std::cout << "Enter x y:\n";
-    std::cin >> x;
-    std::cin >> y;
-    
-    auto v = Array<int16_t>(N, x); // [1] * 14
-    auto w = Array<int16_t>(N, y); // [3] * 14
+    auto v = Array<int16_t>(N, 3); // [1] * 14
+    auto w = Array<int16_t>(N, 4); // [3] * 14
+    std::cout << v << w << "\n";
+    //rand_init(v, N);
+    //rand_init(w, N);
     
     {
         auto t = timing::nsTimer("SIMD");
-        auto z = v + w; // SIMD?
+        v += w; // SIMD?
+        //auto r = v + w;
+        std::cout << v << "\n";
+        s += v[0];
     }
     
-    auto vv = std::vector<int16_t> (N, x);
-    auto vw = std::vector<int16_t> (N, y);
-    
-    
+    auto vv = std::vector<int16_t> (N, 0);
+    auto vw = std::vector<int16_t> (N, 0);
+    rand_init(vv, N);
+    rand_init(vw, N);
     {
-        auto t = timing::nsTimer("loop");
-        auto zv = std::vector<int16_t> (N);
+        auto t = timing::nsTimer("vector");
         for (size_t i=0; i<vv.size(); ++i) {
-            zv[i] = vv[i] + vw[i];
+            vv[i] += vw[i];
         }
+        s += vv[0];
     }
     
+    auto va = std::valarray<int16_t> (1, N);
+    auto wa = std::valarray<int16_t> (1, N);
+    rand_init(va, N);
+    rand_init(wa, N);
+    {
+        auto t = timing::nsTimer("valarray");
+        auto res = va + wa;
+        s += res[0];
+    }
     
+    std::cout << s << "\n";
     
     
      

@@ -56,7 +56,8 @@ public:
     , data {aligned::alloc<T>( capacity, align )}
     {
         if (!data) {
-            throw MemoryException {};
+            std::cerr << "C'tor failed\n";
+            //throw MemoryException {};
         }
     }
     
@@ -67,7 +68,9 @@ public:
     , data {aligned::alloc<T>( capacity, align )}
     {
         if (!data) {
-            throw MemoryException {};
+            std::cerr << "C'tor2 failed\n";
+            std::cerr << alignment << "\n" << size << "\n" << fill_value << "\n";
+            //throw MemoryException {};
         }
         for (size_t i=0; i<used; ++i)
         {
@@ -89,12 +92,14 @@ public:
     {
         if (!data)
         {
-            throw MemoryException {};
+            std::cerr << "Copy C'tor Failed\n";
+            //throw MemoryException {};
         }
-        for (int i=0; i<used; ++i)
-        {
-            data[i] = other.data[i];
-        }
+        //for (int i=0; i<used; ++i)
+        //{
+        //    data[i] = other.data[i];
+        //}
+        std::memcpy(data, other.data, used*sizeof(T));
     }
     
     func operator= (Contiguous const& other) -> Contiguous&
@@ -105,12 +110,15 @@ public:
         data = aligned::alloc<T>( capacity, alignment );
         if (!data)
         {
-            throw MemoryException {};
+            std::cerr << "Copy Assignment Failed\n";
+            //throw MemoryException {};
         }
-        for (int i=0; i<used; ++i)
-        {
-            data[i] = other.data[i];
-        }
+        //for (int i=0; i<used; ++i)
+        //{
+        //    data[i] = other.data[i]; //TODO: use memcpy instead
+        //}
+        
+        std::memcpy(data, other.data, used*sizeof(T));
         return *this;
     }
     
@@ -142,12 +150,18 @@ public:
     
     // Memory-management
     
-    func size() const -> size_t {
+    inline func size() const -> size_t
+    {
         return used;
     }
     
+    inline func get_alignment() const -> size_t
+    {
+        return alignment;
+    }
+    
     // Addressing
-    func operator[] (size_t idx) -> T&
+    inline func operator[] (size_t idx) -> T&
     {
         //if ((unsigned)idx <= used)
             return data[idx];
@@ -155,7 +169,7 @@ public:
         //    throw MemoryException {};
     }
     
-    func operator[] (size_t idx) const -> const T&
+    inline func operator[] (size_t idx) const -> const T&
     {
         //if ((unsigned)idx <= used)
             return data[idx];
@@ -206,15 +220,14 @@ public:
         return oss.str();
     }
     
-    
-    
-    
 private:
     size_t alignment = 16;
     size_t capacity = 0;
     size_t used = 0;
+protected:
     T* data = nullptr;
 };
+
 
 template <typename T>
 std::ostream& operator<<(std::ostream& os, Contiguous<T> const& mem)
@@ -222,5 +235,6 @@ std::ostream& operator<<(std::ostream& os, Contiguous<T> const& mem)
     os << mem.toString();
     return os;
 }
+
 
 #undef func

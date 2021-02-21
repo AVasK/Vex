@@ -1,5 +1,12 @@
 #pragma once
+//#define USE_STD
+
+//TODO: USE aligned_alloc!
+
+#ifndef USE_STD
 #include "intrinsics.hpp" // _mm_malloc, _mm_free
+#endif
+
 #include <cstddef> // size_t
 #define func auto
 
