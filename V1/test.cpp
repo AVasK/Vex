@@ -45,14 +45,14 @@ int main() {
     //std::cout << a << "\n" << b << "\n" << c << "\n" << d << "\n" << e << "\n";
 */
     
-    auto N = 20;
+    auto N = 1000000;
     int s = 0;
     std::srand(std::time(nullptr));
         
     
     auto v = Array<int16_t>(N, 3); // [1] * 14
     auto w = Array<int16_t>(N, 4); // [3] * 14
-    std::cout << v << w << "\n";
+    //std::cout << v << w << "\n";
     //rand_init(v, N);
     //rand_init(w, N);
     
@@ -60,7 +60,7 @@ int main() {
         auto t = timing::nsTimer("SIMD");
         v += w; // SIMD?
         //auto r = v + w;
-        std::cout << v << "\n";
+        //std::cout << v << "\n";
         s += v[0];
     }
     
@@ -83,7 +83,7 @@ int main() {
     {
         auto t = timing::nsTimer("valarray");
         auto res = va + wa;
-        s += res[0];
+        s += res[N/2];
     }
     
     std::cout << s << "\n";

@@ -1,3 +1,4 @@
+///!!! DO NOT COMPILE AS AN INDEPENDENT FILE
 #pragma once
 
 static inline auto iload_128(void const * p) -> __m128i

@@ -1,3 +1,5 @@
+///!!! DO NOT COMPILE AS AN INDEPENDENT FILE
+#pragma once
 #include "intrin_funcs.hh"
 
 template<>
@@ -23,7 +25,20 @@ void Array<i16>::set_func_handlers()
 template<>
 func Array<i16>::operator+= (Array<i16> const& other) -> Array<i16>&
 {
-    this->f_add(*this, *this, other);
+    //this->f_add(*this, *this, other);
+    //return *this;
+        
+    auto align = get_alignment();
+    switch (align) {
+        case 16:
+            i16_add_sse(*this, *this, other);
+            break;
+        case 32:
+            i16_add_avx(*this, *this, other);
+            break;
+        default:
+            break;
+    }
     return *this;
 }
 

@@ -56,8 +56,7 @@ public:
     , data {aligned::alloc<T>( capacity, align )}
     {
         if (!data) {
-            std::cerr << "C'tor failed\n";
-            //throw MemoryException {};
+            throw MemoryException {};
         }
     }
     
@@ -68,9 +67,7 @@ public:
     , data {aligned::alloc<T>( capacity, align )}
     {
         if (!data) {
-            std::cerr << "C'tor2 failed\n";
-            std::cerr << alignment << "\n" << size << "\n" << fill_value << "\n";
-            //throw MemoryException {};
+            throw MemoryException {};
         }
         for (size_t i=0; i<used; ++i)
         {
@@ -92,8 +89,7 @@ public:
     {
         if (!data)
         {
-            std::cerr << "Copy C'tor Failed\n";
-            //throw MemoryException {};
+            throw MemoryException {};
         }
         //for (int i=0; i<used; ++i)
         //{
@@ -110,8 +106,7 @@ public:
         data = aligned::alloc<T>( capacity, alignment );
         if (!data)
         {
-            std::cerr << "Copy Assignment Failed\n";
-            //throw MemoryException {};
+            throw MemoryException {};
         }
         //for (int i=0; i<used; ++i)
         //{
