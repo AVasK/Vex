@@ -27,7 +27,7 @@ func Array<i16>::operator+= (Array<i16> const& other) -> Array<i16>&
 {
     //this->f_add(*this, *this, other);
     //return *this;
-        
+    
     auto align = get_alignment();
     switch (align) {
         case 16:
@@ -40,6 +40,8 @@ func Array<i16>::operator+= (Array<i16> const& other) -> Array<i16>&
             break;
     }
     return *this;
+     
+    
 }
 
 template <>

@@ -5,6 +5,16 @@
 
 #define func auto
 
+
+#ifdef ARCH_x86
+    #if C_CLANG
+        #pragma clang attribute push (__attribute__((target("sse, sse2,sse4.1,sse4.2,ssse3,avx,avx2"))), apply_to=function)
+    #elif C_GCC
+        #pragma GCC push_options
+        #pragma GCC target("sse4.2", "ssse3", "avx", "avx2")
+    #endif
+#endif
+
 //FIXME: Use cpuid + check needed SIMD instr.set to get needed alignment
 size_t dummy_alignment() { return 32; }
 
@@ -105,3 +115,11 @@ private:
 #include "vex.hh"
 
 #undef func
+
+#ifdef ARCH_x86
+    #if C_CLANG
+        #pragma clang attribute pop
+    #elif C_GCC
+        #pragma GCC pop_options
+    #endif
+#endif

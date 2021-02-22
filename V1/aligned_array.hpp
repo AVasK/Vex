@@ -50,9 +50,9 @@ public:
     
     // no initialization (for temporaries)
     Contiguous(size_t size, size_t align)
-    : capacity {blocksize<T>( size, align )}
+    : alignment {align}
+    , capacity {blocksize<T>( size, align )}
     , used {size}
-    , alignment {align}
     , data {aligned::alloc<T>( capacity, align )}
     {
         if (!data) {
@@ -61,9 +61,9 @@ public:
     }
     
     Contiguous(size_t size, T fill_value, size_t align)
-    : capacity {blocksize<T>( size, align )}
+    : alignment {align}
+    , capacity {blocksize<T>( size, align )}
     , used {size}
-    , alignment {align}
     , data {aligned::alloc<T>( capacity, align )}
     {
         if (!data) {
@@ -82,9 +82,9 @@ public:
     
     // Copy ops
     Contiguous(Contiguous const& other)
-    : capacity {other.capacity}
+    : alignment {other.alignment}
+    , capacity {other.capacity}
     , used {other.used}
-    , alignment {other.alignment}
     , data {aligned::alloc<T>( capacity, alignment )}
     {
         if (!data)
@@ -119,9 +119,9 @@ public:
     
     // Move ops
     Contiguous(Contiguous && other)
-    : capacity {other.capacity}
+    : alignment {other.alignment}
+    , capacity {other.capacity}
     , used {other.used}
-    , alignment {other.alignment}
     , data {other.data}
     {
         other.used = 0;

@@ -37,6 +37,7 @@ static inline auto istore_256(void * d, __m256i const& x) -> void
 
 
 // FUNCS:
+//[[gnu::optimize("3")]]
 func i16_add_avx (
                   Array<i16> & res,
                   Array<i16> const& a1,
@@ -56,6 +57,7 @@ func i16_add_avx (
         auto _res = _mm256_add_epi16(_a1, _a2);
         
         istore_256(&res[i<<4], _res);
+        //_mm256_zeroupper();
     }
     return res;
 }
