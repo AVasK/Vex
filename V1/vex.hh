@@ -5,10 +5,10 @@
 template<>
 void Array<i16>::set_func_handlers()
 {
-    if (simd_flags() | SIMD::AVX2) {
+    if (simd_flags() & SIMD::AVX2) {
         f_add = i16_add_avx;
     }
-    else if (simd_flags() | SIMD::SSE2) {
+    else if (simd_flags() & SIMD::SSE2) {
         f_add = i16_add_sse;
     }
 }
@@ -22,10 +22,10 @@ func Array<i16>::operator+= (Array<i16> const& other) -> Array<i16>&
 #if C_GCC // GCC SUPPORTS A GREAT FEATURE CALLED MULTIVERSIONING:
     i16_add_gccmulti(*this, *this, other);
 #else
-    if (simd_flags() | SIMD::AVX2) {
+    if (simd_flags() & SIMD::AVX2) {
         i16_add_avx(*this, *this, other);
     }
-    else if (simd_flags() | SIMD::SSE2) {
+    else if (simd_flags() & SIMD::SSE2) {
         i16_add_sse(*this, *this, other);
     }
 #endif

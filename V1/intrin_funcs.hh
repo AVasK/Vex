@@ -93,6 +93,7 @@ inline func i16_add_avx (
         auto _a2 = iload_256(&a2[i<<4]);
         auto _res = _mm256_add_epi16(_a1, _a2);
         istore_256(&res[i<<4], _res);
+        //_mm256_zeroupper();
     }
     return res;
 }

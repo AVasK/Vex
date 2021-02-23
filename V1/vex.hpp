@@ -16,9 +16,6 @@
     #endif
 #endif
 
-//FIXME: Use cpuid + check needed SIMD instr.set to get needed alignment
-size_t dummy_alignment() { return 32; }
-
 // FORWARD DECLARATION
 template <typename T>
 class Array;
@@ -44,7 +41,7 @@ class Array {
 public:
     // C'tors
     Array(size_t size)
-    : memory (size, dummy_alignment())
+    : memory (size, _alignment())
     {
         #if VEX_PTR_DISPATCH
         set_func_handlers();
@@ -52,7 +49,7 @@ public:
     }
     
     Array(size_t size, T fill_value)
-    : memory(size, fill_value, dummy_alignment())
+    : memory(size, fill_value, _alignment())
     {
         #if VEX_PTR_DISPATCH
         set_func_handlers();
@@ -63,7 +60,7 @@ public:
     
     func get_alignment() const -> size_t
     {
-        return memory.get_alignment();
+        return _alignment();
     }
     
     func size_in_registers() const -> size_t
@@ -107,6 +104,19 @@ protected:
     {
         static CPUID::CPU cpu;
         return cpu.supported_simd();
+        //return CPUID::VEXMODE::SSE2;
+    }
+    
+    static func _alignment() -> int
+    {
+        if (simd_flags() & SIMD::AVX)
+        {
+            return 32;
+        }
+        else
+        {
+            return 16;
+        }
     }
 private:
     BinaryF f_add;
