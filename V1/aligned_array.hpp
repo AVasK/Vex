@@ -4,6 +4,7 @@
 #include <cstddef> // size_t
 #include <cstring> // memcpy
 #include <initializer_list>
+#include <cmath> // ceil
 
 // temporary
 #include <sstream> // ostringstream
@@ -197,7 +198,7 @@ public:
         
         auto reg_size = alignment;
         auto per_register = reg_size/sizeof(T);
-        auto n_registers = capacity/reg_size;
+        //auto n_registers = capacity/reg_size;
         auto masking = true;
         
         for (int i=0; i<capacity; i++)

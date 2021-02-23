@@ -2,9 +2,10 @@
 
 #include "aligned_array.hpp"
 #include "integers.hpp"
+#include "x86_cpuid.hpp"
 
 #define func auto
-
+#define VEX_PTR_DISPATCH 0
 
 #ifdef ARCH_x86
     #if C_CLANG
@@ -45,13 +46,17 @@ public:
     Array(size_t size)
     : memory (size, dummy_alignment())
     {
+        #if VEX_PTR_DISPATCH
         set_func_handlers();
+        #endif
     }
     
     Array(size_t size, T fill_value)
     : memory(size, fill_value, dummy_alignment())
     {
+        #if VEX_PTR_DISPATCH
         set_func_handlers();
+        #endif
     }
     
     // Memory Addressing
@@ -98,6 +103,11 @@ public:
 protected:
     Contiguous<T> memory;
     
+    static func simd_flags() -> u8
+    {
+        static CPUID::CPU cpu;
+        return cpu.supported_simd();
+    }
 private:
     BinaryF f_add;
     BinaryF f_sub;
