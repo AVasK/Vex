@@ -46,16 +46,17 @@ int main() {
 */
     
     auto N = 99999999;
-    //auto N = 30;
+    //auto N = 40;
     int s = 0;
     std::srand(std::time(nullptr));
         
     
     auto v = Array<int16_t>(N, 3); // [1] * 14
     auto w = Array<int16_t>(N, 4); // [3] * 14
+    //v+=w;
     //std::cout << v << w << "\n";
-    //rand_init(v, N);
-    //rand_init(w, N);
+    rand_init(v, N);
+    rand_init(w, N);
     
     {
         auto t = timing::msTimer("SIMD");

@@ -86,7 +86,7 @@ inline func i16_add_avx (
                   )
 -> Array<i16>
 {
-    /*
+/*
     auto n_regs = a1.size_in_registers();
     for (size_t i=0; i < n_regs; ++i)
     {
@@ -96,7 +96,7 @@ inline func i16_add_avx (
         istore_256(&res[i<<4], _res);
         //_mm256_zeroupper();
     }
-     */
+*/
     auto size = a1.size();
     for (size_t i=0; i < size; i+=16)
     {
@@ -105,6 +105,7 @@ inline func i16_add_avx (
         auto _res = _mm256_add_epi16(_a1, _a2);
         istore_256(&res[i], _res);
     }
+
     return res;
 }
 
@@ -126,58 +127,6 @@ inline func i16_add_sse (
     }
     return res;
 }
-
-#if C_GCC
-__attribute__ ((target ("sse2")))
-inline func i16_add_gccmulti (
-                       Array<i16> & res,
-                       Array<i16> const& a1,
-                       Array<i16> const& a2
-                       )
--> Array<i16>
-{
-    auto n_regs = a1.size_in_registers();
-    for (size_t i=0; i < n_regs; ++i)
-    {
-        auto _a1 = iload_128(&a1[i<<3]);
-        auto _a2 = iload_128(&a2[i<<3]);
-        auto _res = _mm_add_epi16(_a1, _a2);
-        istore_128(&res[i<<3], _res);
-    }
-    return res;
-}
-
-__attribute__ ((target ("avx2")))
-__attribute__((optimize("unroll-loops")))
-inline func i16_add_gccmulti (
-                       Array<i16> & res,
-                       Array<i16> const& a1,
-                       Array<i16> const& a2
-                       )
--> Array<i16>
-{
-    /*
-    auto n_regs = a1.size_in_registers();
-    for (size_t i=0; i < n_regs; ++i)
-    {
-        auto register idx = i<<4;
-        auto _a1 = iload_256(&a1[idx]);
-        auto _a2 = iload_256(&a2[idx]);
-        auto _res = _mm256_add_epi16(_a1, _a2);
-        istore_256(&res[idx], _res);
-    }
-     */
-    auto size = a1.size();
-    for (size_t i=0; i < size; i+=16)
-    {
-        auto _a1 = iload_256(&a1[i]);
-        auto _a2 = iload_256(&a2[i]);
-        auto _res = _mm256_add_epi16(_a1, _a2);
-        istore_256(&res[i], _res);
-    }
-    return res;
-}
-#endif
 
 
 
