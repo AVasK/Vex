@@ -19,8 +19,28 @@ func Array<i16>::operator+= (Array<i16> const& other) -> Array<i16>&
 {
     //this->f_add(*this, *this, other);
     //return *this;
-#if C_GCC // GCC SUPPORTS A GREAT FEATURE CALLED MULTIVERSIONING:
-    i16_add_gccmulti(*this, *this, other);
+#if C_GCC // GCC SUPPORTS A GREAT FEATURE CALLED MULTIVERSIONING: (alas it doesn't work so well, at least on Mac)
+    //i16_add_gccmulti(*this, *this, other);
+    if (simd_flags() & SIMD::AVX2) {
+        auto size = other.size();
+        for (size_t i=0; i < size; i+=16)
+        {
+            auto _a1 = iload_256(&other[i]);
+            auto _a2 = iload_256(&(this->memory[i]));
+            auto _res = _mm256_add_epi16(_a1, _a2);
+            istore_256(&(this->memory[i]), _res);
+        }
+    }
+    else {
+        auto size = other.size();
+        for (size_t i=0; i < size; i+=8)
+        {
+            auto _a1 = iload_128(&other[i]);
+            auto _a2 = iload_128(&(this->memory[i]));
+            auto _res = _mm_add_epi16(_a1, _a2);
+            istore_128(&(this->memory[i]), _res);
+        }
+    }
 #else
     if (simd_flags() & SIMD::AVX2) {
         i16_add_avx(*this, *this, other);
