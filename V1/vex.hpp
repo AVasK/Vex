@@ -5,7 +5,6 @@
 #include "x86_cpuid.hpp"
 
 #define func auto
-#define VEX_PTR_DISPATCH 0
 
 #ifdef ARCH_x86
     #if C_CLANG
@@ -22,39 +21,27 @@ class Array;
 
 // FORWARD DECLARED FRIEND FUNCS
 template <typename T>
-Array<T> operator+ (Array<T> const& a1, Array<T> const& a2);
+func operator+ (Array<T> const& a1, Array<T> const& a2) -> Array<T>;
+
+template <typename T>
+func operator+ (Array<T> const& a1, T value) -> Array<T>;
+
+template <typename T>
+func operator+ (T value, Array<T> const& a1) -> Array<T>;
 
 
 // ARRAY class
 template <typename T>
 class Array {
-    
-    // Aliases:
-    using UnaryF  = Array<T> (*) (Array<T> const&);
-    
-    using BinaryF = Array<T> (*) (
-                                  Array<T> & dest,
-                                  Array<T> const&,
-                                  Array<T> const&
-                                 );
-    
 public:
     // C'tors
-    Array(size_t size)
+    explicit Array(size_t size)
     : memory (size, _alignment())
-    {
-        #if VEX_PTR_DISPATCH
-        set_func_handlers();
-        #endif
-    }
+    {}
     
-    Array(size_t size, T fill_value)
+    explicit Array(size_t size, T fill_value)
     : memory(size, fill_value, _alignment())
-    {
-        #if VEX_PTR_DISPATCH
-        set_func_handlers();
-        #endif
-    }
+    {}
     
     // Memory Addressing
     
@@ -91,11 +78,15 @@ public:
     
     // Arithmetics:
     func operator+= (Array const& other) -> Array&;
+    func operator+= (T value) -> Array&;
     func operator*= (Array const& other) -> Array&;
+    func operator*= (T value) -> Array&;
     
     
     // Friend Binary Ops
     friend func operator+<T> (Array const& a1, Array const& a2) -> Array;
+    friend func operator+<T> (Array const& a1, T value) -> Array;
+    friend func operator+<T> (T value, Array const& a1) -> Array;
     
 protected:
     Contiguous<T> memory;
@@ -118,13 +109,6 @@ protected:
             return 16;
         }
     }
-private:
-    BinaryF f_add;
-    BinaryF f_sub;
-    UnaryF f_iadd;
-    UnaryF f_isub;
-    
-    void set_func_handlers();
 };
 
 

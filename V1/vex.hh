@@ -2,6 +2,7 @@
 #pragma once
 #include "intrin_funcs.hh"
 
+#if VEX_PTR_DISPATCH
 template<>
 void Array<i16>::set_func_handlers()
 {
@@ -12,67 +13,105 @@ void Array<i16>::set_func_handlers()
         f_add = i16_add_sse;
     }
 }
+#endif
 
 
-#if C_GCC // GCC SUPPORTS A GREAT FEATURE CALLED MULTIVERSIONING: (alas it doesn't work so well, at least on Mac)
-
-// multiversioning doesn't work with template funcs!
-template<>
-__attribute__((always_inline))
-inline func Array<i16>::operator+= (Array<i16> const& other) -> Array<i16>&
-{
-    //i16_add_gccmulti(*this, *this, other); // GCC MULTIVERSIONING: 117ms on MacOS
-    
-    // plain old if (GCC: 30ms on the SAME MacOS)
-    if (simd_flags() & SIMD::AVX2) {
-        auto size = other.size();
-        for (size_t i=0; i < size; i+=16)
-        {
-            auto _a1 = iload_256(&other[i]);
-            auto _a2 = iload_256(&(this->memory[i]));
-            auto _res = _mm256_add_epi16(_a1, _a2);
-            istore_256(&(this->memory[i]), _res);
-        }
-    }
-    else {
-        auto size = other.size();
-        for (size_t i=0; i < size; i+=8)
-        {
-            auto _a1 = iload_128(&other[i]);
-            auto _a2 = iload_128(&(this->memory[i]));
-            auto _res = _mm_add_epi16(_a1, _a2);
-            istore_128(&(this->memory[i]), _res);
-        }
-    }
-    return *this;
-     
-}
-
-#else
+// GCC SUPPORTS A FEATURE CALLED MULTIVERSIONING: (alas it doesn't work so well, at least on Mac)
+// Also, multiversioning doesn't work with template funcs!
+// So, no GCC-specific specializations for now
+//i16_add_gccmulti(*this, *this, other); // GCC MULTIVERSIONING: 117ms on MacOS
+// plain old if (GCC: 30ms on the SAME MacOS)
 
 template<>
 func Array<i16>::operator+= (Array<i16> const& other) -> Array<i16>&
 {
-    //this->f_add(*this, *this, other);
-    //return *this;
-
     if (simd_flags() & SIMD::AVX2) {
-        i16_add_avx(*this, *this, other);
+        //i16_add_avx(*this, *this, other);
+        I16_256(*this, *this, other, _mm256_add_epi16);
     }
     else if (simd_flags() & SIMD::SSE2) {
-        i16_add_sse(*this, *this, other);
+        //i16_add_sse(*this, *this, other);
+        I16_128(*this, *this, other, _mm_add_epi16);
     }
     return *this;
 }
-#endif
 
-template <>
-inline func operator+ (Array<i16> const& a1, Array<i16> const& a2) -> Array<i16>
+template<>
+func Array<i16>::operator+= (i16 other) -> Array<i16>&
 {
-    Array<i16> res (a1.size());
-    return a1.f_add(res, a1, a2);
+    auto n_regs = size_in_registers();
+    
+    if (simd_flags() & SIMD::AVX2) {
+        for (size_t i=0; i < n_regs; ++i)
+        {
+            auto _r1 = iload_256(&this->memory[i<<4]);
+            auto _r2 = _mm256_set1_epi16(other);
+            auto _res = _mm256_add_epi16(_r1, _r2);
+            istore_256( &this->memory[i<<4], _res );
+        }
+    }
+    else if (simd_flags() & SIMD::SSE2) {
+        for (size_t i=0; i < n_regs; ++i)
+        {
+            auto _r1 = iload_128(&this->memory[i<<3]);
+            auto _r2 = _mm_set1_epi16(other);
+            auto _res = _mm_add_epi16(_r1, _r2);
+            istore_128( &this->memory[i<<3], _res );
+        }
+    }
+    return *this;
 }
 
+template <>
+func operator+ (Array<i16> const& a1, Array<i16> const& a2) -> Array<i16>
+{
+    Array<i16> res (a1.size());
+    if (a1.simd_flags() & SIMD::AVX2) {
+        //i16_add_avx(res, a1, a2);
+        I16_256(res, a1, a2, _mm256_add_epi16);
+    }
+    else if (a1.simd_flags() & SIMD::SSE2) {
+        //i16_add_sse(res, a1, a2);
+        I16_128(res, a1, a2, _mm_add_epi16);
+    }
+    return res;
+}
+
+
+template<>
+func operator+ (Array<i16> const& a, i16 value) -> Array<i16>
+{
+    auto n_regs = a.size_in_registers();
+    Array<i16> res (a.size());
+    
+    if (a.simd_flags() & SIMD::AVX2) {
+        // AVX2
+        for (size_t i=0; i < n_regs; ++i)
+        {
+            auto _r1 = iload_256(&a[i<<4]);
+            auto _r2 = _mm256_set1_epi16(value);
+            auto _res = _mm256_add_epi16(_r1, _r2);
+            istore_256( &res[i<<4], _res);
+        }
+    }
+    else if (a.simd_flags() & SIMD::SSE2) {
+        // SSE2
+        for (size_t i=0; i < n_regs; ++i)
+        {
+            auto _r1 = iload_256(&a[i<<3]);
+            auto _r2 = _mm256_set1_epi16(value);
+            auto _res = _mm256_add_epi16(_r1, _r2);
+            istore_256( &res[i<<3], _res);
+        }
+    }
+    return res;
+}
+
+template<>
+func operator+ (i16 value, Array<i16> const& a) -> Array<i16>
+{
+    return a+value;
+}
 
 /*
 template<typename Func>

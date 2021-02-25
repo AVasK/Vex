@@ -38,26 +38,24 @@ static inline auto istore_256(void * d, __m256i const& x) -> void
 }
 
 
-//#define UNARY_OP()
-
-#define BIN_OP256(op, res, a1, a2, shft)        \
-    auto n_regs = (a1).size_in_registers();     \
-    for (size_t i=0; i < n_regs; ++i)           \
-    {                                           \
-        auto _a1 = iload_256(&(a1)[i<<(shft)]); \
-        auto _a2 = iload_256(&(a2)[i<<(shft)]); \
-    auto _res = (op) (_a1, _a2);                \
-    istore_256(&res[i<<(shft)], _res);          \
+#define I16_256(res, a1, a2, op)           \
+    auto n_regs = (a1).size_in_registers();\
+    for (size_t i=0; i < n_regs; ++i)      \
+    {                                      \
+        auto _a1 = iload_256(&(a1)[i<<4]); \
+        auto _a2 = iload_256(&(a2)[i<<4]); \
+    auto _res = (op) (_a1, _a2);           \
+    istore_256(&(res)[i<<4], _res);        \
     }
 
-#define BIN_OP128(op, res, a1, a2, shft)        \
-    auto n_regs = (a1).size_in_registers();     \
-    for (size_t i=0; i < n_regs; ++i)           \
-    {                                           \
-        auto _a1 = iload_256(&(a1)[i<<(shft)]); \
-        auto _a2 = iload_256(&(a2)[i<<(shft)]); \
-    auto _res = (op) (_a1, _a2);                \
-    istore_256(&res[i<<(shft)], _res);          \
+#define I16_128(res, a1, a2, op)           \
+    auto n_regs = (a1).size_in_registers();\
+    for (size_t i=0; i < n_regs; ++i)      \
+    {                                      \
+        auto _a1 = iload_128(&(a1)[i<<3]); \
+        auto _a2 = iload_128(&(a2)[i<<3]); \
+    auto _res = (op) (_a1, _a2);           \
+    istore_128(&(res)[i<<3], _res);        \
     }
 
 /* ##############################################
@@ -86,7 +84,7 @@ inline func i16_add_avx (
                   )
 -> Array<i16>
 {
-/*
+
     auto n_regs = a1.size_in_registers();
     for (size_t i=0; i < n_regs; ++i)
     {
@@ -96,7 +94,7 @@ inline func i16_add_avx (
         istore_256(&res[i<<4], _res);
         //_mm256_zeroupper();
     }
-*/
+/*
     auto size = a1.size();
     for (size_t i=0; i < size; i+=16)
     {
@@ -105,7 +103,7 @@ inline func i16_add_avx (
         auto _res = _mm256_add_epi16(_a1, _a2);
         istore_256(&res[i], _res);
     }
-
+*/
     return res;
 }
 
