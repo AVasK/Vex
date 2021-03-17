@@ -173,6 +173,8 @@ public:
         //    throw MemoryException {};
     }
     
+    // TODO: Add .at() bounds-checked.
+    
     func size_in_registers() const -> size_t
     {
         return capacity*sizeof(T)/alignment;

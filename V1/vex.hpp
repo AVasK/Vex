@@ -17,29 +17,29 @@
 
 // FORWARD DECLARATION
 template <typename T>
-class Array;
+class Vex;
 
 // FORWARD DECLARED FRIEND FUNCS
 template <typename T>
-func operator+ (Array<T> const& a1, Array<T> const& a2) -> Array<T>;
+func operator+ (Vex<T> const& a1, Vex<T> const& a2) -> Vex<T>;
 
 template <typename T>
-func operator+ (Array<T> const& a1, T value) -> Array<T>;
+func operator+ (Vex<T> const& a1, T value) -> Vex<T>;
 
 template <typename T>
-func operator+ (T value, Array<T> const& a1) -> Array<T>;
+func operator+ (T value, Vex<T> const& a1) -> Vex<T>;
 
 
 // ARRAY class
 template <typename T>
-class Array {
+class Vex {
 public:
     // C'tors
-    explicit Array(size_t size)
+    explicit Vex(size_t size)
     : memory (size, _alignment())
     {}
     
-    explicit Array(size_t size, T fill_value)
+    explicit Vex(size_t size, T fill_value)
     : memory(size, fill_value, _alignment())
     {}
     
@@ -77,16 +77,15 @@ public:
     }
     
     // Arithmetics:
-    func operator+= (Array const& other) -> Array&;
-    func operator+= (T value) -> Array&;
-    func operator*= (Array const& other) -> Array&;
-    func operator*= (T value) -> Array&;
-    
+    func operator+= (Vex const& other) -> Vex&;
+    func operator+= (T value) -> Vex&;
+    func operator*= (Vex const& other) -> Vex&;
+    func operator*= (T value) -> Vex&;
     
     // Friend Binary Ops
-    friend func operator+<T> (Array const& a1, Array const& a2) -> Array;
-    friend func operator+<T> (Array const& a1, T value) -> Array;
-    friend func operator+<T> (T value, Array const& a1) -> Array;
+    friend func operator+<T> (Vex const& a1, Vex const& a2) -> Vex;
+    friend func operator+<T> (Vex const& a1, T value) -> Vex;
+    friend func operator+<T> (T value, Vex const& a1) -> Vex;
     
 protected:
     Contiguous<T> memory;

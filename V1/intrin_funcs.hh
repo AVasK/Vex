@@ -78,11 +78,11 @@ for (size_t i=0; i < n_regs; ++i)
 // FUNCS:
 
 inline func i16_add_avx (
-                  Array<i16> & res,
-                  Array<i16> const& a1,
-                  Array<i16> const& a2
+                  Vex<i16> & res,
+                  Vex<i16> const& a1,
+                  Vex<i16> const& a2
                   )
--> Array<i16>
+-> Vex<i16>
 {
 
     auto n_regs = a1.size_in_registers();
@@ -109,11 +109,11 @@ inline func i16_add_avx (
 
 
 inline func i16_add_sse (
-                  Array<i16> & res,
-                  Array<i16> const& a1,
-                  Array<i16> const& a2
+                  Vex<i16> & res,
+                  Vex<i16> const& a1,
+                  Vex<i16> const& a2
                   )
--> Array<i16>
+-> Vex<i16>
 {
     auto n_regs = a1.size_in_registers();
     for (size_t i=0; i < n_regs; ++i)

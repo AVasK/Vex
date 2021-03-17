@@ -4,7 +4,7 @@
 //============= COMPILER DETECTION =============
 // Clang + LLVM
 #if defined(__clang__)
-    #define C_CLANG 1
+#define C_CLANG 1
     #define C_LLVM  1
 #elif defined(__llvm__)
     #define C_LLVM  1

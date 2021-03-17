@@ -4,7 +4,7 @@
 
 #if VEX_PTR_DISPATCH
 template<>
-void Array<i16>::set_func_handlers()
+void Vex<i16>::set_func_handlers()
 {
     if (simd_flags() & SIMD::AVX2) {
         f_add = i16_add_avx;
@@ -23,12 +23,13 @@ void Array<i16>::set_func_handlers()
 // plain old if (GCC: 30ms on the SAME MacOS)
 
 template<>
-func Array<i16>::operator+= (Array<i16> const& other) -> Array<i16>&
+func Vex<i16>::operator+= (Vex<i16> const& other) -> Vex<i16>&
 {
     if (simd_flags() & SIMD::AVX2) {
         //i16_add_avx(*this, *this, other);
         I16_256(*this, *this, other, _mm256_add_epi16);
     }
+    // TODO: Check if SSE2 is available by default on all x64
     else if (simd_flags() & SIMD::SSE2) {
         //i16_add_sse(*this, *this, other);
         I16_128(*this, *this, other, _mm_add_epi16);
@@ -37,7 +38,7 @@ func Array<i16>::operator+= (Array<i16> const& other) -> Array<i16>&
 }
 
 template<>
-func Array<i16>::operator+= (i16 other) -> Array<i16>&
+func Vex<i16>::operator+= (i16 other) -> Vex<i16>&
 {
     auto n_regs = size_in_registers();
     
@@ -63,9 +64,9 @@ func Array<i16>::operator+= (i16 other) -> Array<i16>&
 }
 
 template <>
-func operator+ (Array<i16> const& a1, Array<i16> const& a2) -> Array<i16>
+func operator+ (Vex<i16> const& a1, Vex<i16> const& a2) -> Vex<i16>
 {
-    Array<i16> res (a1.size());
+    Vex<i16> res (a1.size());
     if (a1.simd_flags() & SIMD::AVX2) {
         //i16_add_avx(res, a1, a2);
         I16_256(res, a1, a2, _mm256_add_epi16);
@@ -79,10 +80,10 @@ func operator+ (Array<i16> const& a1, Array<i16> const& a2) -> Array<i16>
 
 
 template<>
-func operator+ (Array<i16> const& a, i16 value) -> Array<i16>
+func operator+ (Vex<i16> const& a, i16 value) -> Vex<i16>
 {
     auto n_regs = a.size_in_registers();
-    Array<i16> res (a.size());
+    Vex<i16> res (a.size());
     
     if (a.simd_flags() & SIMD::AVX2) {
         // AVX2
@@ -108,14 +109,14 @@ func operator+ (Array<i16> const& a, i16 value) -> Array<i16>
 }
 
 template<>
-func operator+ (i16 value, Array<i16> const& a) -> Array<i16>
+func operator+ (i16 value, Vex<i16> const& a) -> Vex<i16>
 {
     return a+value;
 }
 
 /*
 template<typename Func>
-func Array<i16>::map (Func f)
+func Vex<i16>::map (Func f)
 {
     return *this;//TODO: write function body
 }
@@ -123,7 +124,7 @@ func Array<i16>::map (Func f)
 
 
 template <typename T>
-std::ostream& operator<< (std::ostream& os, Array<T> const& arr)
+std::ostream& operator<< (std::ostream& os, Vex<T> const& arr)
 {
     os << arr.toStream();
     return os;
