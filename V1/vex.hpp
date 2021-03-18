@@ -34,6 +34,9 @@ func operator+ (T value, Vex<T> const& a1) -> Vex<T>;
 template <typename T>
 class Vex {
 public:
+
+    using value_type = T;
+
     // C'tors
     explicit Vex(size_t size)
     : memory (size, _alignment())
@@ -42,6 +45,13 @@ public:
     explicit Vex(size_t size, T fill_value)
     : memory(size, fill_value, _alignment())
     {}
+
+    // TODO: Delete, default is ok
+    Vex (Vex const& other)
+    : memory {other.memory}
+    {
+        std::cout << "vex copy\n";
+    }
     
     // Memory Addressing
     
