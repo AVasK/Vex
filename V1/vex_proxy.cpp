@@ -68,7 +68,7 @@ public:
     : val {_val}
     {}
 
-    func operator[] (size_t) const -> T
+    func operator[] (size_t) const -> value_type
     {
         return val;
     }
@@ -83,10 +83,41 @@ private:
 };
 
 
+template <typename T>
+class VProxy {
+public:
+
+    using value_type = T;
+
+    VProxy(Vex<T> const& vex)
+    : vector {vex}
+    {}
+
+    func size() const -> size_t
+    {
+        return vector.size();
+    }
+
+    func operator[] (size_t idx) const -> value_type
+    {
+        return vector[idx];
+    }
+
+private:
+    Vex<T> const& vector;
+};
+
+
 template <typename V, typename T>
 func add (V const& vex, T val) -> vex_op<V,'+', Val<T>>
 {
     return vex_op< V,'+',Val<T> >( vex, Val<T>(val) );
+}
+
+template <typename T>
+func add (Vex<T> const& vex, T val) -> vex_op<VProxy<T>,'+', Val<T>>
+{
+    return vex_op< VProxy<T>,'+',Val<T> >( VProxy<T>(vex), Val<T>(val) );
 }
 
 template <typename V>
@@ -102,8 +133,11 @@ int main()
     Vex<i16> a(10, 3);
     Vex<i16> b(10, 1);
 
-    Vex<i16> res = add( add( add(a, b), (i16)3), (i16)3);
+    Vex<i16> res = add( add( add(a, (i16)1), (i16)3), (i16)3);
     std::cout << res;
+
+    //auto vp = VProxy<i16>(a + (i16)1 + b);
+    //auto cvp = vp;
 }
 
 #undef func
