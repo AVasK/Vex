@@ -82,7 +82,8 @@ private:
     T val;
 };
 
-
+//  VProxy is a thin wrapper around Vex<T> for 
+//  copy elusion & possible operator[] -> __m128 overload
 template <typename T>
 class VProxy {
 public:
