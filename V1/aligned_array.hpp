@@ -167,6 +167,7 @@ public:
     }
     
     // Addressing
+    __attribute__((always_inline))
     inline func operator[] (size_t idx) -> T&
     {
         //if ((unsigned)idx <= used)
@@ -175,6 +176,7 @@ public:
         //    throw MemoryException {};
     }
     
+    __attribute__((always_inline))
     inline func operator[] (size_t idx) const -> const T&
     {
         //if ((unsigned)idx <= used)

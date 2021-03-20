@@ -6,6 +6,15 @@
 
 #define func auto
 
+#ifdef ARCH_x86
+    #if C_CLANG
+        #pragma clang attribute push (__attribute__((target("sse, sse2, sse3, sse4.1, sse4.2, ssse3, avx, avx2"))), apply_to=function)
+    #elif C_GCC
+        #pragma GCC push_options
+        #pragma GCC target("sse", "sse2", "sse3", "ssse3", "sse4.1", "sse4.2", "avx", "avx2")
+    #endif
+#endif
+
 template <char op>
 func op (__m128i, __m128i) -> __m128i;
 
@@ -181,9 +190,9 @@ func add (V const& vex, T val) -> vex_op<V,'+', Val<T>>
 }
 
 template <typename V, typename T>
-func add (V const& vex, Vex<T> const& v2) -> vex_op<V,'+', VProxy<T>>
+func add (V const& proxy, Vex<T> const& v2) -> vex_op<V,'+', VProxy<T>>
 {
-    return vex_op< V,'+',VProxy<T> >( vex, VProxy<T>(v2) );
+    return vex_op< V,'+',VProxy<T> >( proxy, VProxy<T>(v2) );
 }
 
 template <typename T>
@@ -219,3 +228,12 @@ int main()
 }
 */
 #undef func
+
+
+#ifdef ARCH_x86
+    #if C_CLANG
+        #pragma clang attribute pop
+    #elif C_GCC
+        #pragma GCC pop_options
+    #endif
+#endif

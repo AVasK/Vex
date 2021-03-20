@@ -5,6 +5,9 @@
 
 #include <vector>
 
+template <typename T>
+class Error;
+
 int main() {
 
     int N = 99999999;
@@ -14,6 +17,11 @@ int main() {
     auto c = Vex<i16>(N, 11);
     auto d = Vex<i16>(N, 4);
     auto res = Vex<i16>(N);
+
+    auto c1 = Contiguous<i16>(N, 7, 16);
+    auto c2 = Contiguous<i16>(N, 3, 16);
+    auto c3 = Contiguous<i16>(N, 11, 16);
+    auto c4 = Contiguous<i16>(N, 16);
 
     std::vector<i16> v1 (N, 7);
     std::vector<i16> v2 (N, 3);
@@ -28,11 +36,26 @@ int main() {
         }
     }
 
+    long sum {};
+    for (auto& e : r)
+    {
+        sum += e;
+    }
+    std::cout << sum << "\n";
+
     {
         auto t = timing::msTimer("for-loop");
         for (int i=0; i<a.size(); ++i)
         {
             res[i] = a[i]+b[i]+c[i]+1+d[i];
+        }
+    }
+
+    {
+        auto t = timing::msTimer("contiguous for-loop");
+        for (int i=0; i<c1.size(); ++i)
+        {
+            c4[i] = c1[i]+c2[i]+c3[i]+1+d[i];
         }
     }
 

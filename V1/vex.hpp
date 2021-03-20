@@ -75,6 +75,7 @@ public:
         return memory[idx];
     }
     
+    //__attribute__((always_inline))
     func operator[] (size_t idx) const -> const T&
     {
         return memory[idx];
