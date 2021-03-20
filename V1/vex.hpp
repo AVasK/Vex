@@ -64,6 +64,11 @@ public:
     {
         return memory.size_in_registers();
     }
+
+    func size_in_sse_regs() const -> size_t
+    {
+        return memory.size_in_sse_regs();
+    }
     
     func operator[] (size_t idx) -> T&
     {

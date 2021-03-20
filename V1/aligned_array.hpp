@@ -151,6 +151,16 @@ public:
         return used;
     }
     
+    inline func size_in_registers() const -> size_t
+    {
+        return capacity*sizeof(T)/alignment;
+    }
+
+    func size_in_sse_regs() const -> size_t
+    {
+        return capacity*sizeof(T)/16;
+    }
+    
     inline func get_alignment() const -> size_t
     {
         return alignment;
@@ -174,11 +184,7 @@ public:
     }
     
     // TODO: Add .at() bounds-checked.
-    
-    func size_in_registers() const -> size_t
-    {
-        return capacity*sizeof(T)/alignment;
-    }
+
     
     // toString
     func toString() const -> std::string

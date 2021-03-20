@@ -59,7 +59,7 @@ int main() {
     rand_init(w, N);
     
     {
-        auto t = timing::msTimer("SIMD");
+        auto t = timing::msTimer("SIMD vex += int");
         //v += w; // SIMD?
         v += 7;
         //auto r = v + w;
