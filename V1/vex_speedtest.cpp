@@ -48,6 +48,7 @@ int main() {
         for (int i=0; i<a.size(); ++i)
         {
             res[i] = a[i]+b[i]+c[i]+1+d[i];
+            //res[i] = a[i] + b[i];
         }
     }
 

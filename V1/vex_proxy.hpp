@@ -15,13 +15,37 @@
     #endif
 #endif
 
+/*
+template <typename T>
+struct sse_register_type;
+
+template<> struct sse_register_type<i8> {using type = __m128i;};
+template<> struct sse_register_type<i16> {using type = __m128i;};
+template<> struct sse_register_type<i32> {using type = __m128i;};
+template<> struct sse_register_type<i64> {using type = __m128i;};
+template<> struct sse_register_type<float> {using type = __m128;};
+template<> struct sse_register_type<double> {using type = __m128d;};
+
+template <typename T>
+using sse_reg = typename sse_register_type<T>::type;
+*/
+
 template <char op>
 func op (__m128i, __m128i) -> __m128i;
+
+template <char op>
+func op (__m256i, __m256i) -> __m256i;
 
 template <>
 func op<'+'> (__m128i r1, __m128i r2) -> __m128i
 {
     return _mm_add_epi16(r1, r2);
+}
+
+template <>
+func op<'+'> (__m256i r1, __m256i r2) -> __m256i
+{
+    return _mm256_add_epi16(r1, r2);
 }
 
 
@@ -51,9 +75,9 @@ struct vex_op
         return res;
     }
 
-    func size_in_sse_regs() const -> size_t
+    func size_in_registers() const -> size_t
     {
-        static auto res = std::min(v1.size_in_sse_regs(), v2.size_in_sse_regs());
+        static auto res = std::min(v1.size_in_registers(), v2.size_in_registers());
         return res;
     }
 
@@ -66,34 +90,51 @@ struct vex_op
     {
         auto _r1 = v1.get_sse_reg(idx);
         auto _r2 = v2.get_sse_reg(idx);
-        return _mm_add_epi16(_r1, _r2);
+        return op<'+'>(_r1, _r2);
+    }
+
+    func get_avx_reg (size_t idx) const -> __m256i
+    {
+        auto _r1 = v1.get_avx_reg(idx);
+        auto _r2 = v2.get_avx_reg(idx);
+        return op<'+'>(_r1, _r2);
     }
 
     func eval() const -> Vex<value_type>
     {
-        /*
-        auto len = std::min(v1.size(), v2.size());
+        auto flags = Vex<value_type>::simd_flags();
+        auto len = this->size();
+        auto n_regs = this->size_in_registers();
         Vex<value_type> res (len);
-        for (size_t i = 0; i < len; ++i)
-        {
-            //std::cout << "v1["<<i<<"] = " << v1[i] << "\n"
-            //          << "v2["<<i<<"] = " << v2[i] << "\n";
 
-            res[i] = v1[i] + v2[i];
+        if (flags & SIMD::AVX)
+        {
+            for (size_t i = 0; i < n_regs; ++i)
+            {
+                auto _r1 = v1.get_avx_reg(i);
+                auto _r2 = v2.get_avx_reg(i);
+                auto _res = op<opcode>(_r1, _r2);
+                istore_256( &res[i<<4], _res );
+            }
+        }
+        else 
+        { 
+            #if ARCH_x86_64
+            for (size_t i = 0; i < n_regs; ++i)
+            {
+                auto _r1 = v1.get_sse_reg(i);
+                auto _r2 = v2.get_sse_reg(i);
+                auto _res = op<opcode>(_r1, _r2);
+                istore_128( &res[i<<3], _res );
+            }
+            #elif ARCH_x86_32
+            for (size_t i = 0; i < len; ++i)
+            {
+                res[i] = v1[i] + v2[i];
+            }
+            #endif
         }
         return res;
-        */
-       auto len = this->size();
-       auto n_regs = this->size_in_sse_regs();
-       Vex<value_type> res (len);
-       for (size_t i = 0; i < n_regs; ++i)
-       {
-           auto _r1 = v1.get_sse_reg(i);
-           auto _r2 = v2.get_sse_reg(i);
-           auto _res = op<opcode>(_r1, _r2);
-           istore_128( &res[i<<3], _res );
-       }
-       return res;
     }
 
     T1 const v1;
@@ -121,12 +162,13 @@ public:
         //return std::numeric_limits<std::size_t>::max();
     }
 
-    constexpr func size_in_sse_regs() const -> size_t
+    constexpr func size_in_registers() const -> size_t
     {
         return -1;
     }
 
     func get_sse_reg (size_t idx) const -> __m128i;
+    func get_avx_reg (size_t idx) const -> __m256i;
 
 private:
     T val;
@@ -136,6 +178,13 @@ template<>
 inline func Val<i16>::get_sse_reg(size_t idx) const -> __m128i
 {
     static auto res = _mm_set1_epi16(val);
+    return res;
+}
+
+template<>
+inline func Val<i16>::get_avx_reg(size_t idx) const -> __m256i
+{
+    static auto res = _mm256_set1_epi16(val);
     return res;
 }
 
@@ -156,12 +205,11 @@ public:
         return vector.size();
     }
 
-    func size_in_sse_regs() const -> size_t
+    func size_in_registers() const -> size_t
     {
-        static auto res = vector.size_in_sse_regs();
+        static auto res = vector.size_in_registers();
         return res;
     }
-
 
     func operator[] (size_t idx) const -> value_type
     {
@@ -169,6 +217,7 @@ public:
     }
 
     func get_sse_reg (size_t i) const -> __m128i;
+    func get_avx_reg (size_t i) const -> __m256i;
 
 private:
     Vex<T> const& vector;
@@ -180,6 +229,11 @@ inline func VProxy<i16>::get_sse_reg (size_t i) const -> __m128i
     return iload_128(&vector[i<<3]);
 }
 
+template<>
+inline func VProxy<i16>::get_avx_reg (size_t i) const -> __m256i
+{
+    return iload_256(&vector[i<<4]);
+}
 
 
 

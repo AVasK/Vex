@@ -146,12 +146,12 @@ public:
     
     // Memory-management
     
-    inline func size() const -> size_t
+    func size() const -> size_t
     {
         return used;
     }
     
-    inline func size_in_registers() const -> size_t
+    func size_in_registers() const -> size_t
     {
         return capacity*sizeof(T)/alignment;
     }
@@ -160,8 +160,13 @@ public:
     {
         return capacity*sizeof(T)/16;
     }
+
+    func size_in_avx_regs() const -> size_t
+    {
+        return capacity*sizeof(T)/32;
+    }
     
-    inline func get_alignment() const -> size_t
+    func get_alignment() const -> size_t
     {
         return alignment;
     }

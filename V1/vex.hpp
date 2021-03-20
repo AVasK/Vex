@@ -53,6 +53,25 @@ public:
         std::cout << "vex copy\n";
     }
     
+    static func simd_flags() -> u8
+    {
+        static CPUID::CPU cpu;
+        return cpu.supported_simd();
+        //return CPUID::VEXMODE::SSE2;
+    }
+    
+    static func _alignment() -> int
+    {
+        if (simd_flags() & SIMD::AVX)
+        {
+            return 32;
+        }
+        else
+        {
+            return 16;
+        }
+    }
+
     // Memory Addressing
     
     func get_alignment() const -> size_t
@@ -68,6 +87,11 @@ public:
     func size_in_sse_regs() const -> size_t
     {
         return memory.size_in_sse_regs();
+    }
+
+    func size_in_avx_regs() const -> size_t
+    {
+        return memory.size_in_avx_regs();
     }
     
     func operator[] (size_t idx) -> T&
@@ -105,25 +129,6 @@ public:
     
 protected:
     Contiguous<T> memory;
-    
-    static func simd_flags() -> u8
-    {
-        static CPUID::CPU cpu;
-        return cpu.supported_simd();
-        //return CPUID::VEXMODE::SSE2;
-    }
-    
-    static func _alignment() -> int
-    {
-        if (simd_flags() & SIMD::AVX)
-        {
-            return 32;
-        }
-        else
-        {
-            return 16;
-        }
-    }
 };
 
 
