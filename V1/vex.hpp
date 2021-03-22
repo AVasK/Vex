@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cctools.hpp"
 #include "aligned_array.hpp"
 #include "integers.hpp"
 #include "x86_cpuid.hpp"
@@ -28,6 +29,7 @@ func operator+ (Vex<T> const& a1, T value) -> Vex<T>;
 
 template <typename T>
 func operator+ (T value, Vex<T> const& a1) -> Vex<T>;
+
 
 
 // ARRAY class
@@ -115,6 +117,16 @@ public:
     {
         return memory.size();
     }
+
+    func data() -> Contiguous<T>&
+    {
+        return memory;
+    }
+
+    func data() const -> Contiguous<T> const&
+    {
+        return memory;
+    }
     
     // Arithmetics:
     func operator+= (Vex const& other) -> Vex&;
@@ -131,14 +143,16 @@ protected:
     Contiguous<T> memory;
 };
 
-
 // Intrinsic wrappers lie in another file to avoid clutter...
 #include "intrin_funcs.hh"
 
 // Definitions:
 #include "vex.hh"
 
-#undef func
+/*
+// Proxy:
+#include "vex_proxy.hpp"
+*/
 
 #ifdef ARCH_x86
     #if C_CLANG
@@ -147,3 +161,5 @@ protected:
         #pragma GCC pop_options
     #endif
 #endif
+
+#undef func

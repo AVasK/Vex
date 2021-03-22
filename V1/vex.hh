@@ -2,26 +2,6 @@
 #pragma once
 #include "intrin_funcs.hh"
 
-#if VEX_PTR_DISPATCH
-template<>
-void Vex<i16>::set_func_handlers()
-{
-    if (simd_flags() & SIMD::AVX2) {
-        f_add = i16_add_avx;
-    }
-    else if (simd_flags() & SIMD::SSE2) {
-        f_add = i16_add_sse;
-    }
-}
-#endif
-
-
-// GCC SUPPORTS A FEATURE CALLED MULTIVERSIONING: (alas it doesn't work so well, at least on Mac)
-// Also, multiversioning doesn't work with template funcs!
-// So, no GCC-specific specializations for now
-//i16_add_gccmulti(*this, *this, other); // GCC MULTIVERSIONING: 117ms on MacOS
-// plain old if (GCC: 30ms on the SAME MacOS)
-
 template<>
 func Vex<i16>::operator+= (Vex<i16> const& other) -> Vex<i16>&
 {
@@ -41,7 +21,7 @@ template<>
 func Vex<i16>::operator+= (i16 other) -> Vex<i16>&
 {
     auto n_regs = size_in_registers();
-    
+
     if (simd_flags() & SIMD::AVX2) {
         for (size_t i=0; i < n_regs; ++i)
         {

@@ -1,3 +1,4 @@
+#pragma once
 // vex proxy wrappers
 #include <iostream>
 #include <type_traits>
@@ -30,10 +31,10 @@ template <typename T>
 using sse_reg = typename sse_register_type<T>::type;
 */
 
-template <char op>
+template <char>
 func op (__m128i, __m128i) -> __m128i;
 
-template <char op>
+template <char>
 func op (__m256i, __m256i) -> __m256i;
 
 template <>
@@ -71,13 +72,13 @@ struct vex_op
 
     func size() const -> size_t
     {
-        static auto res = std::min(v1.size(), v2.size());
+        auto res = std::min(v1.size(), v2.size());
         return res;
     }
 
     func size_in_registers() const -> size_t
     {
-        static auto res = std::min(v1.size_in_registers(), v2.size_in_registers());
+        auto res = std::min(v1.size_in_registers(), v2.size_in_registers());
         return res;
     }
 
@@ -207,7 +208,7 @@ public:
 
     func size_in_registers() const -> size_t
     {
-        static auto res = vector.size_in_registers();
+        auto res = vector.size_in_registers();
         return res;
     }
 
@@ -234,8 +235,6 @@ inline func VProxy<i16>::get_avx_reg (size_t i) const -> __m256i
 {
     return iload_256(&vector[i<<4]);
 }
-
-
 
 template <typename V, typename T>
 func add (V const& vex, T val) -> vex_op<V,'+', Val<T>>

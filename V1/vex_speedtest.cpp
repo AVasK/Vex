@@ -1,6 +1,8 @@
 #include <iostream>
 #include "vex.hpp"
 #include "vex_proxy.hpp"
+#include "vex_view.hpp"
+
 #include "timing.hpp"
 
 #include <vector>
@@ -12,7 +14,7 @@ int main() {
 
     int N = 99999999;
     //int N = 10;
-    auto a = Vex<i16>(N, 7);
+    const auto a = Vex<i16>(N, 7);
     auto b = Vex<i16>(N, 3);
     auto c = Vex<i16>(N, 11);
     auto d = Vex<i16>(N, 4);
@@ -45,9 +47,14 @@ int main() {
 
     {
         auto t = timing::msTimer("for-loop");
+        auto rv = view( res );
+        auto av = view( a );
+        auto bv = view( b );
+        auto cv = view( c );
+        auto dv = view( d );
         for (int i=0; i<a.size(); ++i)
         {
-            res[i] = a[i]+b[i]+c[i]+1+d[i];
+            rv[i] = av[i]+bv[i]+cv[i]+1+dv[i];
             //res[i] = a[i] + b[i];
         }
     }
