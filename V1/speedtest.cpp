@@ -64,7 +64,6 @@ int main() {
         v += 7;
         //auto r = v + w;
         //std::cout << v << "\n";
-        s += v[0];
     }
      
     
@@ -87,8 +86,9 @@ int main() {
     rand_init(wa, N);
     {
         auto t = timing::msTimer("valarray");
-        auto res = va + wa;
-        s += res[N/2];
+        //std::valarray<int16_t> res = 
+        //va += wa;
+        va += 7;
     }
     
     //std::cout << s << "\n";

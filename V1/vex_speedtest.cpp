@@ -6,6 +6,7 @@
 #include "timing.hpp"
 
 #include <vector>
+#include <valarray>
 
 template <typename T>
 class Error;
@@ -29,6 +30,12 @@ int main() {
     std::vector<i16> v2 (N, 3);
     std::vector<i16> v3 (N, 11);
     std::vector<i16> r  (N, 0);
+
+    std::valarray<i16> vl1 (7, N);
+    std::valarray<i16> vl2 (3, N);
+    std::valarray<i16> vl3 (11, N);
+    std::valarray<i16> vl4 (4, N);
+    std::valarray<i16> rl (N);
 
     {
         auto t = timing::msTimer("vector for");
@@ -70,6 +77,12 @@ int main() {
     {
         auto t = timing::msTimer("a + b");
         res = a + b + c + i16(1) + d;
+        //res = a + b;
+    }
+
+    {
+        auto t = timing::msTimer("valarray");
+        rl = vl1 + vl2 + vl3 + i16(1) + vl4;
         //res = a + b;
     }
 
