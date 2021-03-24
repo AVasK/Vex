@@ -23,6 +23,18 @@ bool equal(Vex<T> const& vx, std::vector<T> const& v)
     return true;
 }
 
+#ifdef __SSE4_2__ 
+#error "SSE4.2 flag has leaked into user-space"
+#endif
+
+#ifdef __AVX__ 
+#error "AVX flag has leaked into user-space"
+#endif
+
+#ifdef __AVX2__ 
+#error "AVX2 flag has leaked into user-space"
+#endif
+
 int main()
 {
     // TESTING:

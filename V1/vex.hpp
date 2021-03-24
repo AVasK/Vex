@@ -7,14 +7,7 @@
 
 #define func auto
 
-#ifdef ARCH_x86
-    #if C_CLANG
-        #pragma clang attribute push (__attribute__((target("sse, sse2, sse3, sse4.1, sse4.2, ssse3, avx, avx2"))), apply_to=function)
-    #elif C_GCC
-        #pragma GCC push_options
-        #pragma GCC target("sse", "sse2", "sse3", "ssse3", "sse4.1", "sse4.2", "avx", "avx2")
-    #endif
-#endif
+
 
 // FORWARD DECLARATION
 template <typename T>
@@ -47,13 +40,6 @@ public:
     explicit Vex(size_t size, T fill_value)
     : memory(size, fill_value, _alignment())
     {}
-
-    // TODO: Delete, default is ok
-    Vex (Vex const& other)
-    : memory {other.memory}
-    {
-        std::cout << "vex copy\n";
-    }
     
     static func simd_flags() -> u8
     {
@@ -96,6 +82,7 @@ public:
         return memory.size_in_avx_regs();
     }
     
+    //__attribute__((always_inline))
     func operator[] (size_t idx) -> T&
     {
         return memory[idx];
@@ -154,12 +141,6 @@ protected:
 #include "vex_proxy.hpp"
 */
 
-#ifdef ARCH_x86
-    #if C_CLANG
-        #pragma clang attribute pop
-    #elif C_GCC
-        #pragma GCC pop_options
-    #endif
-#endif
+
 
 #undef func

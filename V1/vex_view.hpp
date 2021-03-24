@@ -1,4 +1,4 @@
-// TODO: add .begin() .end() to support range-based loops
+// Not needed anymore.
 
 #include "aligned_array.hpp" //TODO: rename to aligned_memory
 #include "vex.hpp"
