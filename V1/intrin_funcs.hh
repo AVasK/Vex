@@ -1,14 +1,7 @@
 ///!!! DO NOT COMPILE AS AN INDEPENDENT FILE
 #pragma once
 
-#ifdef ARCH_x86
-    #if C_CLANG
-        #pragma clang attribute push (__attribute__((target("sse, sse2, sse3, sse4.1, sse4.2, ssse3, avx, avx2"))), apply_to=function)
-    #elif C_GCC
-        #pragma GCC push_options
-        #pragma GCC target("sse", "sse2", "sse3", "ssse3", "sse4.1", "sse4.2", "avx", "avx2")
-    #endif
-#endif
+#include "SIMD_flags.set"
 
 static inline auto iload_128(void const * p) -> __m128i
 {
@@ -123,11 +116,4 @@ inline func i16_add_sse (
     return res;
 }
 
-
-#ifdef ARCH_x86
-    #if C_CLANG
-        #pragma clang attribute pop
-    #elif C_GCC
-        #pragma GCC pop_options
-    #endif
-#endif
+#include "SIMD_flags.discard"

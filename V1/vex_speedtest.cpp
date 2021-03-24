@@ -12,17 +12,17 @@ template <typename T>
 class Error;
 
 
-#ifdef __SSE4_2__ 
-#error "SSE4.2 flag has leaked into user-space"
-#endif
+// #ifdef __SSE4_2__ 
+// #error "SSE4.2 flag has leaked into user-space"
+// #endif
 
-#ifdef __AVX__ 
-#error "AVX flag has leaked into user-space"
-#endif
+// #ifdef __AVX__ 
+// #error "AVX flag has leaked into user-space"
+// #endif
 
-#ifdef __AVX2__ 
-#error "AVX2 flag has leaked into user-space"
-#endif
+// #ifdef __AVX2__ 
+// #error "AVX2 flag has leaked into user-space"
+// #endif
 
 
 int main() {
@@ -53,7 +53,7 @@ int main() {
 
     {
         auto t = timing::msTimer("vector for");
-        for (int i=0; i<v1.size(); ++i)
+        for (size_t i=0; i<v1.size(); ++i)
         {
             r[i] = v1[i] + v2[i] + v3[i] + 1 + d[i];
         }
@@ -68,14 +68,9 @@ int main() {
 
     {
         auto t = timing::msTimer("for-loop");
-        auto rv = view( res );
-        auto av = view( a );
-        auto bv = view( b );
-        auto cv = view( c );
-        auto dv = view( d );
         for (int i=0; i<a.size(); ++i)
         {
-            rv[i] = av[i]+bv[i]+cv[i]+1+dv[i];
+            res[i] = a[i]+b[i]+c[i]+1+d[i];
             //res[i] = a[i] + b[i];
         }
     }
