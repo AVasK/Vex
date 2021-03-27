@@ -55,6 +55,7 @@ func operator+ (T, Vex<T> const&) -> VISum<T>;
 func operator+ (Vex<float> const&, Vex<float> const&) -> FMAProxy<float>;
 */
 
+// Friend functions
 template <typename T>
 func vex_add (Vex<T> const&, Vex<T> const&) -> Vex<T>;
 
@@ -64,7 +65,7 @@ func vex_add (Vex<T> const&, T) -> Vex<T>;
 template <typename T>
 func vex_add (T, Vex<T> const&) -> Vex<T>;
 
-// ARRAY class
+// Vex class
 template <typename T>
 class Vex {
 public:

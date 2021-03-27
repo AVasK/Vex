@@ -252,7 +252,7 @@ public:
     }
     
 private:
-    size_t alignment = 16;
+    size_t alignment;
     size_t capacity = 0;
     size_t used = 0;
 protected:

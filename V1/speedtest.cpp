@@ -85,7 +85,6 @@ int main() {
         Vex<i16> r = add(v, w);
         //std::cout << v << "\n";
     }
-     
     
     auto vv = std::vector<int16_t> (N, 0);
     auto vw = std::vector<int16_t> (N, 0);
