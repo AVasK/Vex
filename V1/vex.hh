@@ -65,8 +65,10 @@ func Vex<i16>::operator+= (i16 other) -> Vex<i16>&
 }
 
 template <>
-func operator+ (Vex<i16> const& a1, Vex<i16> const& a2) -> Vex<i16>
+func vex_add (Vex<i16> const& a1, Vex<i16> const& a2) -> Vex<i16>
 {
+    // TODO: add min_size to for-loop part, mb try to make more generic...
+    //auto len = std::min(a1.size(), a2.size());
     Vex<i16> res (a1.size());
     if (a1.simd_flags() & SIMD::AVX2) {
         //i16_add_avx(res, a1, a2);
@@ -81,7 +83,7 @@ func operator+ (Vex<i16> const& a1, Vex<i16> const& a2) -> Vex<i16>
 
 
 template<>
-func operator+ (Vex<i16> const& a, i16 value) -> Vex<i16>
+func vex_add (Vex<i16> const& a, i16 value) -> Vex<i16>
 {
     auto n_regs = a.size_in_registers();
     Vex<i16> res (a.size());
@@ -110,9 +112,9 @@ func operator+ (Vex<i16> const& a, i16 value) -> Vex<i16>
 }
 
 template<>
-func operator+ (i16 value, Vex<i16> const& a) -> Vex<i16>
+func vex_add (i16 value, Vex<i16> const& vex) -> Vex<i16>
 {
-    return a+value;
+    return vex_add(vex, value);
 }
 
 /*

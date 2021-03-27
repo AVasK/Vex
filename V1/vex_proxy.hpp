@@ -22,8 +22,9 @@
 // vex proxy wrappers
 #include <iostream>
 #include <type_traits>
-//#include <limits>
-//#include "vex.hpp"
+#include <limits>
+#include "vex.hpp"
+//#include "simd_ops.hpp"
 
 #define func auto
 
@@ -45,23 +46,31 @@ using sse_reg = typename sse_register_type<T>::type;
 */
 
 template <char>
-func op (__m128i, __m128i) -> __m128i;
+auto op (__m128i, __m128i) -> __m128i;
 
 template <char>
-func op (__m256i, __m256i) -> __m256i;
+auto op (__m256i, __m256i) -> __m256i;
 
 template <>
-func op<'+'> (__m128i r1, __m128i r2) -> __m128i
+auto op<'+'> (__m128i r1, __m128i r2) -> __m128i
 {
     return _mm_add_epi16(r1, r2);
 }
 
 template <>
-func op<'+'> (__m256i r1, __m256i r2) -> __m256i
+auto op<'+'> (__m256i r1, __m256i r2) -> __m256i
 {
     return _mm256_add_epi16(r1, r2);
 }
 
+////////// VEX_OP ////////////////
+// minimal interface for T1 & T2:
+// > size()
+// > size_in_registers()
+// > get_sse_reg()
+// > get_avx_reg()
+// > operator[]
+//////////////////////////////////
 
 template <typename T1, char opcode, typename T2>
 struct vex_op
@@ -172,13 +181,14 @@ public:
 
     constexpr func size() const -> const size_t 
     {
-        return -1;
-        //return std::numeric_limits<std::size_t>::max();
+        //return -1;
+        return std::numeric_limits<std::size_t>::max();
     }
 
     constexpr func size_in_registers() const -> size_t
     {
-        return -1;
+        //return -1;
+        return std::numeric_limits<std::size_t>::max();
     }
 
     func get_sse_reg (size_t idx) const -> __m128i;

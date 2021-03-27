@@ -33,17 +33,36 @@
 template <typename T>
 class Vex;
 
-// FORWARD DECLARED FRIEND FUNCS
 template <typename T>
-func operator+ (Vex<T> const& a1, Vex<T> const& a2) -> Vex<T>;
-
-template <typename T>
-func operator+ (Vex<T> const& a1, T value) -> Vex<T>;
+class FMAProxy;
 
 template <typename T>
-func operator+ (T value, Vex<T> const& a1) -> Vex<T>;
+class VSum;
+template <typename T>
+class VISum;
 
 
+/*
+template <typename T>
+func operator+ (Vex<T> const&, Vex<T> const&) -> VSum<T>;
+
+template <typename T>
+func operator+ (Vex<T> const&, T) -> VISum<T>;
+
+template <typename T>
+func operator+ (T, Vex<T> const&) -> VISum<T>;
+
+func operator+ (Vex<float> const&, Vex<float> const&) -> FMAProxy<float>;
+*/
+
+template <typename T>
+func vex_add (Vex<T> const&, Vex<T> const&) -> Vex<T>;
+
+template <typename T>
+func vex_add (Vex<T> const&, T) -> Vex<T>;
+
+template <typename T>
+func vex_add (T, Vex<T> const&) -> Vex<T>;
 
 // ARRAY class
 template <typename T>
@@ -142,9 +161,9 @@ public:
     func operator*= (T value) -> Vex&;
     
     // Friend Binary Ops
-    friend func operator+<T> (Vex const& a1, Vex const& a2) -> Vex;
-    friend func operator+<T> (Vex const& a1, T value) -> Vex;
-    friend func operator+<T> (T value, Vex const& a1) -> Vex;
+    friend func vex_add<T> (Vex const& a1, Vex const& a2) -> Vex;
+    friend func vex_add<T> (Vex const& a1, T value) -> Vex;
+    friend func vex_add<T> (T value, Vex const& a1) -> Vex;
     
 protected:
     Contiguous<T> memory;
@@ -155,6 +174,7 @@ protected:
 
 // Definitions:
 #include "vex.hh"
+#include "vex2proxy.hh"
 
 /*
 // Proxy:

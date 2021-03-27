@@ -8,7 +8,7 @@
 #include <vector>
 #include <cstdlib> // rng
 
-#include "intrinsics.hpp"
+#include "vex_proxy.hpp"
 
 #ifdef __SSE4_2__ 
 #error "SSE4.2 flag has leaked into user-space"
@@ -71,23 +71,34 @@ int main() {
     rand_init(w, N);
     
     {
-        auto t = timing::msTimer("SIMD vex += int");
+        auto t = timing::msTimer("SIMD vex + vex");
         //v += w; // SIMD?
-        v += 7;
-        //auto r = v + w;
+        //v += 7;
+        Vex<i16> r = v + w;
+        //std::cout << v << "\n";
+    }
+
+    {
+        auto t = timing::msTimer("SIMD proxy vex <+> vex");
+        //v += w; // SIMD?
+        //v += 7;
+        Vex<i16> r = add(v, w);
         //std::cout << v << "\n";
     }
      
     
     auto vv = std::vector<int16_t> (N, 0);
     auto vw = std::vector<int16_t> (N, 0);
+    std::vector<i16> res;
     rand_init(vv, N);
     rand_init(vw, N);
     {
         auto t = timing::msTimer("vector");
+        res = std::vector<i16>(N);
         for (size_t i=0; i<vv.size(); ++i) {
             //vv[i] += vw[i];
-            vv[i] += 7;
+            //vv[i] += 7;
+            res[i] = vv[i] + vw[i];
         }
         s += vv[0];
     }
@@ -98,9 +109,9 @@ int main() {
     rand_init(wa, N);
     {
         auto t = timing::msTimer("valarray");
-        //std::valarray<int16_t> res = 
+        std::valarray<i16> res = va + wa;
         //va += wa;
-        va += 7;
+        //va += 7;
     }
     
     //std::cout << s << "\n";
