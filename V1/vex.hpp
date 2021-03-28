@@ -34,9 +34,6 @@ template <typename T>
 class Vex;
 
 template <typename T>
-class FMAProxy;
-
-template <typename T>
 class VSum;
 template <typename T>
 class VISum;

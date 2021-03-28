@@ -1,5 +1,7 @@
 // Included into vex.hpp
 #include "vex_proxy.hpp"
+#include "num_types.hpp"
+
 
 template <typename T>
 struct VSum {
