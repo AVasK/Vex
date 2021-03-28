@@ -43,9 +43,9 @@ int main()
     ASSERT_EQ(vex3, vec3);
     auto vex1 = Vex<i16>(10, 1);
     auto vex2 = Vex<i16>(10, 2);
-    ASSERT_EQ(vex1 + vex2, vec3);
+    ASSERT_EQ(Vex<i16>(vex1 + vex2), vec3);
     ASSERT_EQ(vex2 += vex1, vec3);
-    ASSERT_EQ(vex1 + i16(2), vec3); // operator+ (Vex<i16>, int)
+    ASSERT_EQ(Vex<i16>(vex1 + 2), vec3); // operator+ (Vex<i16>, int)
     ASSERT_EQ(vex1 += 2, vec3);
     
 }

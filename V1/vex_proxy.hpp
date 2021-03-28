@@ -103,8 +103,8 @@ struct vex_op
         {
             for (size_t i = 0; i < n_regs; ++i)
             {
-                auto _r1 = v1.get_avx_reg(i);
-                auto _r2 = v2.get_avx_reg(i);
+                auto _r1 = v1.get_avx_reg(i<<4);
+                auto _r2 = v2.get_avx_reg(i<<4);
                 auto _res = op<opcode>(_r1, _r2);
                 istore_256( &res[i<<4], _res );
             }
@@ -114,8 +114,8 @@ struct vex_op
             #if ARCH_x86_64
             for (size_t i = 0; i < n_regs; ++i)
             {
-                auto _r1 = v1.get_sse_reg(i);
-                auto _r2 = v2.get_sse_reg(i);
+                auto _r1 = v1.get_sse_reg(i<<3);
+                auto _r2 = v2.get_sse_reg(i<<3);
                 auto _res = op<opcode>(_r1, _r2);
                 istore_128( &res[i<<3], _res );
             }
@@ -141,6 +141,10 @@ public:
 
     Val(T _val)
     : val {_val}
+    {}
+
+    Val(promote_t<T> _val)
+    : val (_val) //potential narrowing
     {}
 
     func operator[] (size_t) const -> value_type
@@ -219,13 +223,13 @@ private:
 template<>
 inline func VProxy<i16>::get_sse_reg (size_t i) const -> sse_reg<value_type>
 {
-    return iload_128(&vector[i<<3]);
+    return iload_128(&vector[i]);
 }
 
 template<>
 inline func VProxy<i16>::get_avx_reg (size_t i) const -> avx_reg<value_type>
 {
-    return iload_256(&vector[i<<4]);
+    return iload_256(&vector[i]);
 }
 
 #include "SIMD_flags.discard"

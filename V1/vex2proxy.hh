@@ -31,17 +31,17 @@ struct VSum {
         return v1[idx] + v2[idx];
     }
 
-    auto get_sse_reg (size_t idx) const -> __m128i
+    auto get_sse_reg (size_t i) const -> sse_reg<value_type>
     {
-        auto _r1 = v1.get_sse_reg(idx);
-        auto _r2 = v2.get_sse_reg(idx);
+        auto _r1 = iload_128(&v1[i]);
+        auto _r2 = iload_128(&v2[i]);
         return op<'+'>(_r1, _r2);
     }
 
-    auto get_avx_reg (size_t idx) const -> __m256i
+    auto get_avx_reg (size_t i) const -> avx_reg<value_type>
     {
-        auto _r1 = v1.get_avx_reg(idx);
-        auto _r2 = v2.get_avx_reg(idx);
+        auto _r1 = iload_256(&v1[i]);
+        auto _r2 = iload_256(&v2[i]);
         return op<'+'>(_r1, _r2);
     }
 
@@ -82,30 +82,46 @@ auto operator+ (Vex<T> const& v1, Vex<T> const& v2) -> VSum<T>
 }
 
 template <typename T>
-auto operator+ (Vex<T> const& v, int val) -> VISum<T>
+auto operator+ (Vex<T> const& v, promote_t<T> val) -> VISum<T>
 {
     return VISum<T>(v, T(val));
 }
 
 template <typename T>
-auto operator+ (int val, Vex<T> const& v) -> VISum<T>
+auto operator+ (promote_t<T> val, Vex<T> const& v) -> VISum<T>
 {
     return VISum<T>(v, T(val));
 }
 
-// specialization for i64
-auto operator+ (Vex<i64> const& v, i64 val) -> VISum<i64>
-{
-    return VISum<i64>(v, val);
-}
-auto operator+ (i64 val, Vex<i64> const& v) -> VISum<i64>
-{
-    return VISum<i64>(v, val);
-}
 
 // VSum / VISum to vex_op in case where there are more additions/subtractions e.t.c
 template <typename T, template<typename> class Vexlike>
-auto operator+ (VSum<T> const& vsum, Vexlike<T> const& vexlike) -> vex_op<VSum<T>, '+', Vexlike<T>>
+auto operator+ (VSum<T> const& vsum, Vexlike<T> const& vexlike) -> vex_op<VSum<T>,'+',Vexlike<T>>
 {
     return vex_op<VSum<T>, '+', Vexlike<T>>(vsum, vexlike);
+}
+
+template <typename T>
+auto operator+ (VSum<T> const& vsum, Vex<T> const& vex) -> vex_op<VSum<T>,'+',VProxy<T>>
+{
+    return vex_op<VSum<T>,'+',VProxy<T>>( vsum, VProxy<T>(vex) );
+}
+
+template <typename T>
+auto operator+ (VSum<T> const& vsum, promote_t<T> val) -> vex_op<VSum<T>,'+',Val<T>>
+{
+    return vex_op<VSum<T>,'+',Val<T>>( vsum, Val<T>(val) );
+}
+
+
+template <typename Vexlike, typename _vtype = typename Vexlike::value_type>
+auto operator+ (Vexlike const& vexlike, promote_t<_vtype> val) -> vex_op<Vexlike,'+',Val<_vtype>>
+{
+    return vex_op<Vexlike,'+',Val<_vtype>>( vexlike, Val<_vtype>(val) );
+}
+
+template <typename Vexlike, typename _vtype = typename Vexlike::value_type>
+auto operator+ (Vexlike const& vexlike, Vex<_vtype> const& vex) -> vex_op<Vexlike,'+',VProxy<_vtype>>
+{
+    return vex_op<Vexlike,'+',VProxy<_vtype>>( vexlike, VProxy<_vtype>(vex) );
 }

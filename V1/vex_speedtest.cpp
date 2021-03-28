@@ -85,7 +85,7 @@ int main() {
 
     {
         auto t = timing::msTimer("a + b");
-        res = a + b + c + i16(1) + d;
+        res = a + b + c + 1 + d;
         //res = a + b;
     }
 
