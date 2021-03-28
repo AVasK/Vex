@@ -33,15 +33,15 @@ struct VSum {
 
     auto get_sse_reg (size_t i) const -> sse_reg<value_type>
     {
-        auto _r1 = iload_128(&v1[i]);
-        auto _r2 = iload_128(&v2[i]);
+        auto _r1 = load_sse(&v1[i]);
+        auto _r2 = load_sse(&v2[i]);
         return op<'+'>(_r1, _r2);
     }
 
     auto get_avx_reg (size_t i) const -> avx_reg<value_type>
     {
-        auto _r1 = iload_256(&v1[i]);
-        auto _r2 = iload_256(&v2[i]);
+        auto _r1 = load_avx(&v1[i]);
+        auto _r2 = load_avx(&v2[i]);
         return op<'+'>(_r1, _r2);
     }
 

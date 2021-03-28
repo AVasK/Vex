@@ -46,19 +46,19 @@ func Vex<i16>::operator+= (i16 other) -> Vex<i16>&
     if (simd_flags() & SIMD::AVX2) {
         for (size_t i=0; i < n_regs; ++i)
         {
-            auto _r1 = iload_256(&this->memory[i<<4]);
+            auto _r1 = load_avx(&this->memory[i<<4]);
             auto _r2 = _mm256_set1_epi16(other);
             auto _res = _mm256_add_epi16(_r1, _r2);
-            istore_256( &this->memory[i<<4], _res );
+            store_avx( &this->memory[i<<4], _res );
         }
     }
     else if (simd_flags() & SIMD::SSE2) {
         for (size_t i=0; i < n_regs; ++i)
         {
-            auto _r1 = iload_128(&this->memory[i<<3]);
+            auto _r1 = load_sse(&this->memory[i<<3]);
             auto _r2 = _mm_set1_epi16(other);
             auto _res = _mm_add_epi16(_r1, _r2);
-            istore_128( &this->memory[i<<3], _res );
+            store_sse( &this->memory[i<<3], _res );
         }
     }
     return *this;
@@ -92,20 +92,20 @@ func vex_add (Vex<i16> const& a, i16 value) -> Vex<i16>
         // AVX2
         for (size_t i=0; i < n_regs; ++i)
         {
-            auto _r1 = iload_256(&a[i<<4]);
+            auto _r1 = load_avx(&a[i<<4]);
             auto _r2 = _mm256_set1_epi16(value);
             auto _res = _mm256_add_epi16(_r1, _r2);
-            istore_256( &res[i<<4], _res);
+            store_avx( &res[i<<4], _res);
         }
     }
     else if (a.simd_flags() & SIMD::SSE2) {
         // SSE2
         for (size_t i=0; i < n_regs; ++i)
         {
-            auto _r1 = iload_256(&a[i<<3]);
+            auto _r1 = load_avx(&a[i<<3]);
             auto _r2 = _mm256_set1_epi16(value);
             auto _res = _mm256_add_epi16(_r1, _r2);
-            istore_256( &res[i<<3], _res);
+            store_avx( &res[i<<3], _res);
         }
     }
     return res;
