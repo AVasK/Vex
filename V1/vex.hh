@@ -47,7 +47,7 @@ func Vex<i16>::operator+= (i16 other) -> Vex<i16>&
         for (size_t i=0; i < n_regs; ++i)
         {
             auto _r1 = load_avx(&this->memory[i<<4]);
-            auto _r2 = _mm256_set1_epi16(other);
+            auto _r2 = set1_value_avx(other);
             auto _res = _mm256_add_epi16(_r1, _r2);
             store_avx( &this->memory[i<<4], _res );
         }
@@ -56,7 +56,7 @@ func Vex<i16>::operator+= (i16 other) -> Vex<i16>&
         for (size_t i=0; i < n_regs; ++i)
         {
             auto _r1 = load_sse(&this->memory[i<<3]);
-            auto _r2 = _mm_set1_epi16(other);
+            auto _r2 = set1_value_sse(other);
             auto _res = _mm_add_epi16(_r1, _r2);
             store_sse( &this->memory[i<<3], _res );
         }
@@ -94,7 +94,7 @@ func vex_add (Vex<i16> const& a, i16 value) -> Vex<i16>
         {
             auto _r1 = load_avx(&a[i<<4]);
             auto _r2 = _mm256_set1_epi16(value);
-            auto _res = _mm256_add_epi16(_r1, _r2);
+            auto _res = op<'+'>(_r1, _r2);
             store_avx( &res[i<<4], _res);
         }
     }
@@ -102,10 +102,10 @@ func vex_add (Vex<i16> const& a, i16 value) -> Vex<i16>
         // SSE2
         for (size_t i=0; i < n_regs; ++i)
         {
-            auto _r1 = load_avx(&a[i<<3]);
-            auto _r2 = _mm256_set1_epi16(value);
-            auto _res = _mm256_add_epi16(_r1, _r2);
-            store_avx( &res[i<<3], _res);
+            auto _r1 = load_sse(&a[i<<3]);
+            auto _r2 = _mm_set1_epi16(value);
+            auto _res = op<'+'>(_r1, _r2);
+            store_sse( &res[i<<3], _res);
         }
     }
     return res;

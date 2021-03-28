@@ -23,6 +23,7 @@
 #include "cctools.hpp"
 #include "aligned_array.hpp"
 #include "integers.hpp"
+#include "simd_ops.hpp"
 #include "x86_cpuid.hpp"
 
 #define func auto
