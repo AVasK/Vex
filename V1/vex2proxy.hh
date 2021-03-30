@@ -2,7 +2,6 @@
 #include "vex_proxy.hpp"
 #include "num_types.hpp"
 
-
 template <typename T>
 struct VSum {
 
@@ -38,13 +37,7 @@ struct VSum {
         return op<'+'>(_r1, _r2);
     }
 
-    auto get_avx_reg (size_t i) const -> avx_reg<value_type>
-    {
-        auto _r1 = load_avx(&v1[i]);
-        auto _r2 = load_avx(&v2[i]);
-        return op<'+'>(_r1, _r2);
-    }
-
+    auto get_avx_reg (size_t i) const -> avx_reg<value_type>;
 
     operator Vex<T> ()
     {
@@ -52,6 +45,8 @@ struct VSum {
     }
 
 };
+
+#include "vex2proxy.tpp"
 
 template <typename T>
 struct VISum {
@@ -114,11 +109,14 @@ auto operator+ (VSum<T> const& vsum, promote_t<T> val) -> vex_op<VSum<T>,'+',Val
 }
 
 
-template <typename Vexlike, typename _vtype = typename Vexlike::value_type>
-auto operator+ (Vexlike const& vexlike, promote_t<_vtype> val) -> vex_op<Vexlike,'+',Val<_vtype>>
+template <typename Vexlike, 
+          typename _vtype = typename Vexlike::value_type,
+          typename _ptype = promote_t<_vtype>>
+auto operator+ (Vexlike const& vexlike, _ptype val) -> vex_op<Vexlike,'+',Val<_vtype>>
 {
     return vex_op<Vexlike,'+',Val<_vtype>>( vexlike, Val<_vtype>(val) );
 }
+
 
 template <typename Vexlike, typename _vtype = typename Vexlike::value_type>
 auto operator+ (Vexlike const& vexlike, Vex<_vtype> const& vex) -> vex_op<Vexlike,'+',VProxy<_vtype>>
