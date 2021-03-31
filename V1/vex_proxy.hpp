@@ -75,7 +75,7 @@ struct vex_op
 
     func operator[] (size_t idx) const -> value_type
     {
-        return v1[idx] + v2[idx];
+        return op<opcode>(v1[idx], v2[idx]);
     }
 
     func get_sse_reg (size_t idx) const -> sse_reg<value_type>

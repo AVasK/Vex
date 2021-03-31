@@ -111,7 +111,8 @@ auto operator+ (VSum<T> const& vsum, promote_t<T> val) -> vex_op<VSum<T>,'+',Val
 
 template <typename Vexlike, 
           typename _vtype = typename Vexlike::value_type,
-          typename _ptype = promote_t<_vtype>>
+          typename _ptype = promote_t<_vtype>,
+          typename = typename std::enable_if<std::is_convertible<Vexlike, Vex<_vtype>>::value>::type>
 auto operator+ (Vexlike const& vexlike, _ptype val) -> vex_op<Vexlike,'+',Val<_vtype>>
 {
     return vex_op<Vexlike,'+',Val<_vtype>>( vexlike, Val<_vtype>(val) );
