@@ -5,3 +5,6 @@
         #pragma GCC pop_options
     #endif
 #endif
+
+#undef VEX_SSE
+#undef VEX_AVX

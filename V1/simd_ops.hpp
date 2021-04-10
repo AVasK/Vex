@@ -1,6 +1,8 @@
 #pragma once 
 
+#include "simd_types.hpp"
 #include "intrinsics.hpp"
+
 #include "SIMD_flags.set"
 #define func auto
 
@@ -31,6 +33,16 @@ auto set1_value_avx (i16 value) -> __m256i
 auto set1_value_sse (i16 value) -> __m128i
 {
     return _mm_set1_epi16( value );
+}
+
+auto operator+ (sse_i8 r1, sse_i8 r2) -> sse_i8
+{
+    return sse_i8(_mm_adds_epi8(r1, r2));
+}
+
+auto operator+ (sse_i16 r1, sse_i16 r2) -> sse_i16
+{
+    return sse_i16(_mm_adds_epi16(r1, r2));
 }
 
 #undef func
