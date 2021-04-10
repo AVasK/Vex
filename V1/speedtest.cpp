@@ -10,6 +10,7 @@
 
 #include "vex_proxy.hpp"
 
+/*
 #ifdef __SSE4_2__ 
 #error "SSE4.2 flag has leaked into user-space"
 #endif
@@ -21,6 +22,7 @@
 #ifdef __AVX2__ 
 #error "AVX2 flag has leaked into user-space"
 #endif
+*/
 
 template <typename T>
 void rand_init(T & array_like, size_t N)
@@ -58,42 +60,43 @@ int main() {
 */
     
     auto N = 99999999;
-    //auto N = 40;
+    //auto N = 42;
     int s = 0;
     std::srand(std::time(nullptr));
         
     
-    auto v = Vex<int16_t>(N, 3); // [1] * 14
-    auto w = Vex<int16_t>(N, 4); // [3] * 14
+    auto v = Vex<i8>(N, 'a'); // [7] * 14
+    auto w = Vex<i8>(N, 1); // [2] * 14
     //v+=w;
+    
+    //rand_init(v, N);
+    //rand_init(w, N);
     //std::cout << v << w << "\n";
-    rand_init(v, N);
-    rand_init(w, N);
     
     {
         auto t = timing::msTimer("SIMD vex + vex");
         //v += w; // SIMD?
         //v += 7;
-        Vex<i16> r = v + w;
-        //std::cout << v << "\n";
+        Vex<i8> r = v + w;
+        //std::cout << r << "\n";
     }
 
     {
         auto t = timing::msTimer("SIMD proxy vex <+> vex");
         //v += w; // SIMD?
         //v += 7;
-        Vex<i16> r = add(v, w);
-        //std::cout << v << "\n";
+        Vex<i8> r = add(v, w);
+        //std::cout << r << "\n";
     }
     
-    auto vv = std::vector<int16_t> (N, 0);
-    auto vw = std::vector<int16_t> (N, 0);
-    std::vector<i16> res;
+    auto vv = std::vector<i8> (N, 0);
+    auto vw = std::vector<i8> (N, 0);
+    std::vector<i8> res;
     rand_init(vv, N);
     rand_init(vw, N);
     {
         auto t = timing::msTimer("vector");
-        res = std::vector<i16>(N);
+        res = std::vector<i8>(N);
         for (size_t i=0; i<vv.size(); ++i) {
             //vv[i] += vw[i];
             //vv[i] += 7;
@@ -102,13 +105,13 @@ int main() {
         s += vv[0];
     }
     
-    auto va = std::valarray<int16_t> (1, N);
-    auto wa = std::valarray<int16_t> (1, N);
+    auto va = std::valarray<i8> (1, N);
+    auto wa = std::valarray<i8> (1, N);
     rand_init(va, N);
     rand_init(wa, N);
     {
         auto t = timing::msTimer("valarray");
-        std::valarray<i16> res = va + wa;
+        std::valarray<i8> res = va + wa;
         //va += wa;
         //va += 7;
     }

@@ -25,7 +25,7 @@
 #include <limits>
 #include "vex.hpp"
 #include "simd_ops.hpp"
-#include "num_types.hpp"
+#include "simd_types.hpp"
 
 #define func auto
 
@@ -103,10 +103,10 @@ struct vex_op
         {
             for (size_t i = 0; i < n_regs; ++i)
             {
-                auto _r1 = v1.get_avx_reg(i<<4);
-                auto _r2 = v2.get_avx_reg(i<<4);
+                auto _r1 = v1.get_avx_reg(i * avx_reg<value_type>::offset);
+                auto _r2 = v2.get_avx_reg(i * avx_reg<value_type>::offset);
                 auto _res = op<opcode>(_r1, _r2);
-                store_avx( &res[i<<4], _res );
+                store_avx( &res[i * avx_reg<value_type>::offset], _res );
             }
         }
         else 
@@ -114,10 +114,10 @@ struct vex_op
             #if ARCH_x86_64
             for (size_t i = 0; i < n_regs; ++i)
             {
-                auto _r1 = v1.get_sse_reg(i<<3);
-                auto _r2 = v2.get_sse_reg(i<<3);
+                auto _r1 = v1.get_sse_reg(i * sse_reg<value_type>::offset);
+                auto _r2 = v2.get_sse_reg(i * sse_reg<value_type>::offset);
                 auto _res = op<opcode>(_r1, _r2);
-                store_sse( &res[i<<3], _res );
+                store_sse( &res[i * sse_reg<value_type>::offset], _res );
             }
             #elif ARCH_x86_32
             for (size_t i = 0; i < len; ++i)
@@ -164,24 +164,23 @@ public:
         return std::numeric_limits<std::size_t>::max();
     }
 
-    func get_sse_reg (size_t idx) const -> sse_reg<value_type>;
+    func get_sse_reg (size_t idx) const -> sse_reg<value_type>
+    {
+    static auto res = sse_reg<value_type>(val);
+    return res;
+    }
+    
     func get_avx_reg (size_t idx) const -> avx_reg<value_type>;
 
 private:
     T val;
 };
 
-template<>
-inline func Val<i16>::get_sse_reg(size_t idx) const -> sse_reg<value_type>
-{
-    static auto res = _mm_set1_epi16(val);
-    return res;
-}
 
-template<>
-inline func Val<i16>::get_avx_reg(size_t idx) const -> avx_reg<value_type>
+template<typename T>
+inline func Val<T>::get_avx_reg(size_t idx) const -> avx_reg<value_type>
 {
-    static auto res = _mm256_set1_epi16(val);
+    static auto res = avx_reg<value_type>( val );
     return res;
 }
 

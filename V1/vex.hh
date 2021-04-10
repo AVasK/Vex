@@ -23,96 +23,132 @@
 
 #include "SIMD_flags.set"
 
-template<>
-func Vex<i16>::operator+= (Vex<i16> const& other) -> Vex<i16>&
+template<typename T>
+func Vex<T>::operator+= (Vex<T> const& other) -> Vex<T>&
 {
+    auto n_regs = size_in_registers();
     if (simd_flags() & SIMD::AVX2) {
         //i16_add_avx(*this, *this, other);
-        I16_256(*this, *this, other, _mm256_add_epi16);
+        for (size_t i=0; i < n_regs; ++i)
+        {
+            auto _r1 = load_avx(&this->memory[i * avx_reg<T>::offset]);
+            auto _r2 = load_avx(&other.memory[i * avx_reg<T>::offset]);
+            auto _res = _r1 + _r2;
+            store_avx( &this->memory[i * avx_reg<T>::offset], _res );
+        }
     }
     // TODO: Check if SSE2 is available by default on all x64
     else if (simd_flags() & SIMD::SSE2) {
         //i16_add_sse(*this, *this, other);
-        I16_128(*this, *this, other, _mm_add_epi16);
+        for (size_t i=0; i < n_regs; ++i)
+        {
+            auto _r1 = load_sse(&this->memory[i * sse_reg<T>::offset]);
+            auto _r2 = load_sse(&other.memory[i * sse_reg<T>::offset]);
+            auto _res = _r1 + _r2;
+            store_sse( &this->memory[i * sse_reg<T>::offset], _res );
+        }
     }
     return *this;
 }
 
-template<>
-func Vex<i16>::operator+= (i16 other) -> Vex<i16>&
+template<typename T>
+func Vex<T>::operator+= (T other) -> Vex<T>&
 {
     auto n_regs = size_in_registers();
-
+    
     if (simd_flags() & SIMD::AVX2) {
+        // AVX2
         for (size_t i=0; i < n_regs; ++i)
         {
-            auto _r1 = load_avx(&this->memory[i<<4]);
-            auto _r2 = set1_value_avx(other);
-            auto _res = _mm256_add_epi16(_r1, _r2);
-            store_avx( &this->memory[i<<4], _res );
+            //auto _r1 = load_avx(&a[i<<4]);
+            //auto _r2 = _mm256_set1_epi16(value);
+            //auto _res = op<'+'>(_r1, _r2);
+            auto _r1 = load_avx(&this->memory[i*avx_reg<T>::offset]);
+            auto _r2 = avx_reg<T>( other );
+            auto _res = _r1 + _r2;
+            store_avx( &this->memory[i*avx_reg<T>::offset], _res );
         }
     }
     else if (simd_flags() & SIMD::SSE2) {
+        // SSE2
         for (size_t i=0; i < n_regs; ++i)
         {
-            auto _r1 = load_sse(&this->memory[i<<3]);
-            auto _r2 = set1_value_sse(other);
-            auto _res = _mm_add_epi16(_r1, _r2);
-            store_sse( &this->memory[i<<3], _res );
+            auto _r1 = load_sse(&this->memory[i*sse_reg<T>::offset]);
+            auto _r2 = sse_reg<T>( other );
+            auto _res = _r1 + _r2;
+            store_sse( &this->memory[i*sse_reg<T>::offset], _res );
         }
     }
     return *this;
 }
 
-template <>
-func vex_add (Vex<i16> const& a1, Vex<i16> const& a2) -> Vex<i16>
+template <typename T>
+func vex_add (Vex<T> const& a1, Vex<T> const& a2) -> Vex<T>
 {
     // TODO: add min_size to for-loop part, mb try to make more generic...
     //auto len = std::min(a1.size(), a2.size());
-    Vex<i16> res (a1.size());
+    _mm256_zeroupper();
+    Vex<T> res (a1.size());
+    auto n_regs = std::min(a1.size_in_registers(), a2.size_in_registers());
+
     if (a1.simd_flags() & SIMD::AVX2) {
         //i16_add_avx(res, a1, a2);
-        I16_256(res, a1, a2, _mm256_add_epi16);
+        for (size_t i=0; i < n_regs; ++i)
+        {
+            auto _r1 = load_avx(&a1[i * avx_reg<T>::offset]);
+            auto _r2 = load_avx(&a2[i * avx_reg<T>::offset]);
+            auto _res = _r1 + _r2;
+            store_avx( &res[i * avx_reg<T>::offset], _res);
+        }
     }
     else if (a1.simd_flags() & SIMD::SSE2) {
         //i16_add_sse(res, a1, a2);
-        I16_128(res, a1, a2, _mm_add_epi16);
+        for (size_t i=0; i < n_regs; ++i)
+        {
+            auto _r1 = load_sse(&a1[i * sse_reg<T>::offset]);
+            auto _r2 = load_sse(&a2[i * sse_reg<T>::offset]);
+            auto _res = _r1 + _r2;
+            store_sse( &res[i * sse_reg<T>::offset], _res);
+        }
     }
     return res;
 }
 
 
-template<>
-func vex_add (Vex<i16> const& a, i16 value) -> Vex<i16>
+template<typename T>
+inline func vex_add (Vex<T> const& a, T value) -> Vex<T>
 {
     auto n_regs = a.size_in_registers();
-    Vex<i16> res (a.size());
+    Vex<T> res (a.size());
     
     if (a.simd_flags() & SIMD::AVX2) {
         // AVX2
         for (size_t i=0; i < n_regs; ++i)
         {
-            auto _r1 = load_avx(&a[i<<4]);
-            auto _r2 = _mm256_set1_epi16(value);
-            auto _res = op<'+'>(_r1, _r2);
-            store_avx( &res[i<<4], _res);
+            //auto _r1 = load_avx(&a[i<<4]).as_register();
+            //auto _r2 = _mm256_set1_epi16(value);
+            //auto _res = _mm256_adds_epi16(_r1, _r2);
+            auto _r1 = load_avx(&a[i * avx_reg<T>::offset]);
+            auto _r2 = avx_reg<T>( value );
+            auto _res = _r1 + _r2;
+            store_avx( &res[i * avx_reg<T>::offset], _res);
         }
     }
     else if (a.simd_flags() & SIMD::SSE2) {
         // SSE2
         for (size_t i=0; i < n_regs; ++i)
         {
-            auto _r1 = load_sse(&a[i<<3]);
-            auto _r2 = _mm_set1_epi16(value);
-            auto _res = op<'+'>(_r1, _r2);
-            store_sse( &res[i<<3], _res);
+            auto _r1 = load_sse(&a[i * sse_reg<T>::offset]);
+            auto _r2 = sse_reg<T>( value );
+            auto _res = _r1 + _r2;
+            store_sse( &res[i * sse_reg<T>::offset], _res);
         }
     }
     return res;
 }
 
-template<>
-func vex_add (i16 value, Vex<i16> const& vex) -> Vex<i16>
+template<typename T>
+func vex_add (T value, Vex<T> const& vex) -> Vex<T>
 {
     return vex_add(vex, value);
 }

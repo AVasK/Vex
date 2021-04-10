@@ -2,6 +2,7 @@
 #include <vector>
 #include "integers.hpp"
 #include "vex.hpp"
+#include "simd_types.hpp"
 
 #define ASSERT_EQ(a, b) \
     do { \
@@ -37,13 +38,18 @@ bool equal(Vex<T> const& vx, std::vector<T> const& v)
 
 int main()
 {
+    avx_i8 v8 = 4;
+    sse_u8 w8 = 0;
+    avx_i16 v16 = 0;
     // TESTING:
     const auto vec3 = std::vector<i16>(10, 3);
     auto vex3 = Vex<i16>(10, 3);
     ASSERT_EQ(vex3, vec3);
+    std::cout << "vex3 = " << vex3 << "\n";
     auto vex1 = Vex<i16>(10, 1);
     auto vex2 = Vex<i16>(10, 2);
     ASSERT_EQ(Vex<i16>(vex1 + vex2), vec3);
+    std::cout << "vex1 + vex2 = " << Vex<i16>(vex1 + vex2) << "\n";
     ASSERT_EQ(vex2 += vex1, vec3);
     ASSERT_EQ(Vex<i16>(vex1 + 2), vec3); // operator+ (Vex<i16>, int)
     ASSERT_EQ(vex1 += 2, vec3);

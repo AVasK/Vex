@@ -70,6 +70,7 @@ struct VISum {
 
 };
 
+
 template <typename T>
 auto operator+ (Vex<T> const& v1, Vex<T> const& v2) -> VSum<T>
 {

@@ -17,35 +17,41 @@ struct sse_i128 {
     __m128i data;
     sse_i128 (__m128i reg) : data{ reg } {}
     operator __m128i () { return data; }
+    auto as_register() -> __m128i { return data; }
 };
 
 struct avx_i256 {
     __m256i data;
     avx_i256 (__m256i reg) : data{ reg } {}
     operator __m256i () { return data; }
+    auto as_register() -> __m256i { return data; }
 };
 
 // ======== SSE ========
 #ifdef VEX_SSE
 struct sse_i8  : sse_i128 {
-    sse_i8(i8 _v) : sse_i128{ _mm_set1_epi8(_v) } {}
-    sse_i8(sse_i128 reg) : sse_i128{ reg } {}
+    constexpr const static int offset = 128 / 8;
+    explicit sse_i8(i8 _v) : sse_i128{ _mm_set1_epi8(_v) } {}
+    explicit sse_i8(__m128i reg) : sse_i128{ reg } {}
 };
 struct sse_i16 : sse_i128 {
-    sse_i16(i16 _v) : sse_i128{ _mm_set1_epi16(_v) } {}
-    sse_i16(sse_i128 reg) : sse_i128{ reg } {}
+    constexpr const static int offset = 128 / 16;
+    explicit sse_i16(i16 _v) : sse_i128{ _mm_set1_epi16(_v) } {}
+    explicit sse_i16(__m128i reg) : sse_i128{ reg } {}
 };
 struct sse_i32 : sse_i128 {
-    sse_i32(i32 _v) : sse_i128{ _mm_set1_epi32(_v) } {}
-    sse_i32(sse_i128 reg) : sse_i128{ reg } {}
+    constexpr const static int offset = 128 / 32;
+    explicit sse_i32(i32 _v) : sse_i128{ _mm_set1_epi32(_v) } {}
+    explicit sse_i32(__m128i reg) : sse_i128{ reg } {}
 };
 struct sse_i64 : sse_i128 {
-    sse_i64(i64 _v) : sse_i128{ _mm_set1_epi64x(_v) } {}
-    sse_i64(sse_i128 reg) : sse_i128{ reg } {}
+    constexpr const static int offset = 128 / 64;
+    explicit sse_i64(i64 _v) : sse_i128{ _mm_set1_epi64x(_v) } {}
+    explicit sse_i64(__m128i reg) : sse_i128{ reg } {}
 };
 
 struct sse_u8  : sse_i8 {
-    sse_u8(u8 _v) : sse_i8( _v ) {}
+    explicit sse_u8(u8 _v) : sse_i8( _v ) {}
 };
 
 #endif
@@ -53,20 +59,24 @@ struct sse_u8  : sse_i8 {
 #ifdef VEX_AVX
 
 struct avx_i8  : avx_i256 {
-    avx_i8(i8 _v) : avx_i256{ _mm256_set1_epi8(_v) } {}
-    avx_i8(avx_i256 reg) : avx_i256{ reg } {}
+    constexpr const static int offset = 256 / 8;
+    explicit avx_i8(i8 _v) : avx_i256{ _mm256_set1_epi8(_v) } {}
+    explicit avx_i8(__m256i reg) : avx_i256{ reg } {}
 };
 struct avx_i16 : avx_i256 {
-    avx_i16(i16 _v) : avx_i256{ _mm256_set1_epi16(_v) } {}
-    avx_i16(avx_i256 reg) : avx_i256{ reg } {}
+    constexpr const static int offset = 256 / 16;
+    explicit avx_i16(i16 _v) : avx_i256{ _mm256_set1_epi16(_v) } {}
+    explicit avx_i16(__m256i reg) : avx_i256{ reg } {}
 };
 struct avx_i32 : avx_i256 {
-    avx_i32(i32 _v) : avx_i256{ _mm256_set1_epi32(_v) } {}
-    avx_i32(avx_i256 reg) : avx_i256{ reg } {}
+    constexpr const static int offset = 256 / 32;
+    explicit avx_i32(i32 _v) : avx_i256{ _mm256_set1_epi32(_v) } {}
+    explicit avx_i32(__m256i reg) : avx_i256{ reg } {}
 };
 struct avx_i64 : avx_i256 {
-    avx_i64(i64 _v) : avx_i256{ _mm256_set1_epi64x(_v) } {}
-    avx_i64(avx_i256 reg) : avx_i256{ reg } {}
+    constexpr const static int offset = 256 / 64;
+    explicit avx_i64(i64 _v) : avx_i256{ _mm256_set1_epi64x(_v) } {}
+    explicit avx_i64(__m256i reg) : avx_i256{ reg } {}
 };
 
 struct avx_u8  : avx_i256 {};
@@ -79,18 +89,30 @@ template <typename T>
 struct sse_register_type;
 
 template <typename T>
-using sse_reg = typename sse_register_type< promote_t<T> >::type;
+using sse_reg = typename sse_register_type<T>::type;
 
 template<>
-struct sse_register_type<int> 
+struct sse_register_type<i8> 
 {
-    using type = __m128i;
+    using type = sse_i8;
+};
+
+template<>
+struct sse_register_type<i16> 
+{
+    using type = sse_i16;
+};
+
+template<>
+struct sse_register_type<i32> 
+{
+    using type = sse_i32;
 };
 
 template<>
 struct sse_register_type<i64> 
 {
-    using type = __m128i;
+    using type = sse_i64;
 };
 
 template<>
@@ -110,18 +132,30 @@ template <typename T>
 struct avx_register_type;
 
 template <typename T>
-using avx_reg = typename avx_register_type< promote_t<T> >::type;
+using avx_reg = typename avx_register_type<T>::type;
 
 template<>
-struct avx_register_type<int> 
+struct avx_register_type<i8> 
 {
-    using type = __m256i;
+    using type = avx_i8;
+};
+
+template<>
+struct avx_register_type<i16> 
+{
+    using type = avx_i16;
+};
+
+template<>
+struct avx_register_type<i32> 
+{
+    using type = avx_i32;
 };
 
 template<>
 struct avx_register_type<i64> 
 {
-    using type = __m256i;
+    using type = avx_i64;
 };
 
 template<>
