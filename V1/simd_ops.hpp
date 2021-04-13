@@ -3,15 +3,17 @@
 #include "simd_types.hpp"
 #include "intrinsics.hpp"
 
-#include "SIMD_flags.set"
+//#include "SIMD_flags.set"
 #define func auto
 
 
+__attribute__((target("avx2")))
 auto set1_value_avx (i16 value) -> __m256i
 {
     return _mm256_set1_epi16( value );
 }
 
+__attribute__((target("sse")))
 auto set1_value_sse (i16 value) -> __m128i
 {
     return _mm_set1_epi16( value );
@@ -50,31 +52,37 @@ auto operator+ (sse_double r1, sse_double r2) -> sse_double
 }
 
 // ======== AVX ========
+__attribute__((target("avx2")))
 auto operator+ (avx_i8 r1, avx_i8 r2) -> avx_i8
 {
     return avx_i8(_mm256_adds_epi8(r1, r2));
 }
 
+__attribute__((target("avx2")))
 auto operator+ (avx_i16 r1, avx_i16 r2) -> avx_i16
 {
     return avx_i16(_mm256_add_epi16(r1, r2));
 }
 
+__attribute__((target("avx2")))
 auto operator+ (avx_i32 r1, avx_i32 r2) -> avx_i32
 {
     return avx_i32(_mm256_add_epi32(r1, r2));
 }
 
+__attribute__((target("avx2")))
 auto operator+ (avx_i64 r1, avx_i64 r2) -> avx_i64
 {
     return avx_i64(_mm256_add_epi64(r1, r2));
 }
 
+__attribute__((target("avx2")))
 auto operator+ (avx_float r1, avx_float r2) -> avx_float
 {
     return _mm256_add_ps(r1, r2);
 }
 
+__attribute__((target("avx2")))
 auto operator+ (avx_double r1, avx_double r2) -> avx_double
 {
     return _mm256_add_pd(r1, r2);
@@ -118,4 +126,4 @@ DEF_SIMD_OP(+, avx_i64)
 
 
 #undef func
-#include "SIMD_flags.discard"
+//#include "SIMD_flags.discard"

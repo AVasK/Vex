@@ -21,37 +21,39 @@
 #pragma once
 #include "intrin_funcs.hh"
 
-#include "SIMD_flags.set"
 
 template<typename T>
+__attribute__((target("avx2")))
 func Vex<T>::operator+= (Vex<T> const& other) -> Vex<T>&
 {
-    auto n_regs = size_in_registers();
+    //auto n_regs = size_in_registers();
     if (simd_flags() & SIMD::AVX2) {
-        //i16_add_avx(*this, *this, other);
-        for (size_t i=0; i < n_regs; ++i)
-        {
-            auto _r1 = load_avx(&this->memory[i * avx_reg<T>::offset]);
-            auto _r2 = load_avx(&other.memory[i * avx_reg<T>::offset]);
-            auto _res = _r1 + _r2;
-            store_avx( &this->memory[i * avx_reg<T>::offset], _res );
-        }
+        std::cerr << "call to i16_add_avx\n";
+        add_avx(*this, *this, other);
+        // for (size_t i=0; i < n_regs; ++i)
+        // {
+        //     auto _r1 = load_avx(&this->memory[i * avx_reg<T>::offset]);
+        //     auto _r2 = load_avx(&other.memory[i * avx_reg<T>::offset]);
+        //     auto _res = _r1 + _r2;
+        //     store_avx( &this->memory[i * avx_reg<T>::offset], _res );
+        // }
     }
     // TODO: Check if SSE2 is available by default on all x64
     else if (simd_flags() & SIMD::SSE2) {
-        //i16_add_sse(*this, *this, other);
-        for (size_t i=0; i < n_regs; ++i)
-        {
-            auto _r1 = load_sse(&this->memory[i * sse_reg<T>::offset]);
-            auto _r2 = load_sse(&other.memory[i * sse_reg<T>::offset]);
-            auto _res = _r1 + _r2;
-            store_sse( &this->memory[i * sse_reg<T>::offset], _res );
-        }
+        add_sse(*this, *this, other);
+        // for (size_t i=0; i < n_regs; ++i)
+        // {
+        //     auto _r1 = load_sse(&this->memory[i * sse_reg<T>::offset]);
+        //     auto _r2 = load_sse(&other.memory[i * sse_reg<T>::offset]);
+        //     auto _res = _r1 + _r2;
+        //     store_sse( &this->memory[i * sse_reg<T>::offset], _res );
+        // }
     }
     return *this;
 }
 
 template<typename T>
+__attribute__((target("avx2")))
 func Vex<T>::operator+= (T other) -> Vex<T>&
 {
     auto n_regs = size_in_registers();
@@ -83,11 +85,11 @@ func Vex<T>::operator+= (T other) -> Vex<T>&
 }
 
 template <typename T>
+__attribute__((target("avx2")))
 func vex_add (Vex<T> const& a1, Vex<T> const& a2) -> Vex<T>
 {
     // TODO: add min_size to for-loop part, mb try to make more generic...
     //auto len = std::min(a1.size(), a2.size());
-    _mm256_zeroupper();
     Vex<T> res (a1.size());
     auto n_regs = std::min(a1.size_in_registers(), a2.size_in_registers());
 
@@ -116,6 +118,7 @@ func vex_add (Vex<T> const& a1, Vex<T> const& a2) -> Vex<T>
 
 
 template<typename T>
+__attribute__((target("avx2")))
 inline func vex_add (Vex<T> const& a, T value) -> Vex<T>
 {
     auto n_regs = a.size_in_registers();
@@ -148,6 +151,7 @@ inline func vex_add (Vex<T> const& a, T value) -> Vex<T>
 }
 
 template<typename T>
+__attribute__((target("avx2")))
 func vex_add (T value, Vex<T> const& vex) -> Vex<T>
 {
     return vex_add(vex, value);
@@ -168,5 +172,3 @@ std::ostream& operator<< (std::ostream& os, Vex<T> const& arr)
     os << arr.toStream();
     return os;
 }
-
-#include "SIMD_flags.discard"

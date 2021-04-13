@@ -4,14 +4,15 @@
 #include <type_traits>
 
 
+#define VEX_AVX
+#define VEX_SSE
+
+
 template <typename T>
 using promote_t = typename std::remove_reference<decltype( 
         std::declval<T>() + 0
     )>::type;
 
-
-// SIMD type wrappers:
-#include "SIMD_flags.set"
 
 struct sse_i128 {
     __m128i data;
@@ -42,8 +43,13 @@ struct sse_double {
 
 struct avx_i256 {
     __m256i data;
+
     avx_i256 (__m256i reg) : data{ reg } {}
+
+    __attribute__((target("avx2")))
     operator __m256i () { return data; }
+
+    __attribute__((target("avx2")))
     auto as_register() -> __m256i { return data; }
 };
 
@@ -52,8 +58,13 @@ struct avx_float {
     constexpr const static int offset = 32 / sizeof(float);
 
     avx_float (__m256 reg) : data {reg} {}
+
     explicit avx_float(float _v) : data{ _mm256_set1_ps(_v) } {}
+
+    __attribute__((target("avx2"))) 
     operator __m256 () { return data; }
+
+    __attribute__((target("avx2")))
     auto as_register() -> __m256 { return data; }
 };
 
@@ -62,8 +73,13 @@ struct avx_double {
     constexpr const static int offset = 32 / sizeof(double);
 
     avx_double (__m256d reg) : data {reg} {}
+
     explicit avx_double(double _v) : data{ _mm256_set1_pd(_v) } {}
+
+    __attribute__((target("avx2")))
     operator __m256d () { return data; }
+
+    __attribute__((target("avx2")))
     auto as_register() -> __m256d { return data; }
 };
 
@@ -93,36 +109,52 @@ struct sse_i64 : sse_i128 {
 struct sse_u8  : sse_i8 {
     explicit sse_u8(u8 _v) : sse_i8( _v ) {}
 };
+#endif // VEX_SSE
 
-#endif
+
 // ======== AVX ========
 #ifdef VEX_AVX
 
 struct avx_i8  : avx_i256 {
     constexpr const static int offset = 256 / 8;
+
+    __attribute__((target("avx2")))
     explicit avx_i8(i8 _v) : avx_i256{ _mm256_set1_epi8(_v) } {}
+
+    __attribute__((target("avx2")))
     explicit avx_i8(__m256i reg) : avx_i256{ reg } {}
 };
 struct avx_i16 : avx_i256 {
     constexpr const static int offset = 256 / 16;
+
+    __attribute__((target("avx2")))
     explicit avx_i16(i16 _v) : avx_i256{ _mm256_set1_epi16(_v) } {}
+
+    __attribute__((target("avx2")))
     explicit avx_i16(__m256i reg) : avx_i256{ reg } {}
 };
 struct avx_i32 : avx_i256 {
     constexpr const static int offset = 256 / 32;
+    __attribute__((target("avx2")))
     explicit avx_i32(i32 _v) : avx_i256{ _mm256_set1_epi32(_v) } {}
+    
+    __attribute__((target("avx2")))
     explicit avx_i32(__m256i reg) : avx_i256{ reg } {}
 };
 struct avx_i64 : avx_i256 {
     constexpr const static int offset = 256 / 64;
+
+    __attribute__((target("avx2")))
     explicit avx_i64(i64 _v) : avx_i256{ _mm256_set1_epi64x(_v) } {}
+
+    __attribute__((target("avx2")))
     explicit avx_i64(__m256i reg) : avx_i256{ reg } {}
 };
 
 struct avx_u8  : avx_i256 {};
 
-#endif
-#include "SIMD_flags.discard"
+#endif // VEX_AVX
+
 
 // SSE_REGISTER template:
 template <typename T>

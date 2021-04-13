@@ -29,8 +29,6 @@
 
 #define func auto
 
-#include "SIMD_flags.set"
-
 
 ////////// VEX_OP ////////////////
 // minimal interface for T1 & T2:
@@ -56,8 +54,8 @@ struct vex_op
     , v2 {t2}
     {}
 
-    operator Vex<value_type> () const {
-        //std::cout << "to Vex\n";
+    operator Vex<value_type> () const
+    {
         return eval();
     }
 
@@ -85,6 +83,7 @@ struct vex_op
         return op<'+'>(_r1, _r2);
     }
 
+    __attribute__((target("avx2")))
     func get_avx_reg (size_t idx) const -> avx_reg<value_type>
     {
         auto _r1 = v1.get_avx_reg(idx);
@@ -92,6 +91,7 @@ struct vex_op
         return op<'+'>(_r1, _r2);
     }
 
+    __attribute__((target("avx2")))
     func eval() const -> Vex<value_type>
     {
         auto flags = Vex<value_type>::simd_flags();
@@ -143,9 +143,9 @@ public:
     : val {_val}
     {}
 
-    Val(promote_t<T> _val)
-    : val (_val) //potential narrowing
-    {}
+    // Val(promote_t<T> _val)
+    // : val (_val) //potential narrowing
+    // {}
 
     func operator[] (size_t) const -> value_type
     {
@@ -170,20 +170,23 @@ public:
     return res;
     }
     
-    func get_avx_reg (size_t idx) const -> avx_reg<value_type>;
+    __attribute__((target("avx2")))
+    func get_avx_reg (size_t idx) const -> avx_reg<value_type>
+    {
+        static auto res = avx_reg<value_type>( val );
+        return res;
+    }
 
 private:
     T val;
 };
 
-template<typename T>
-inline func Val<T>::get_avx_reg(size_t idx) const -> avx_reg<value_type>
-{
-    static auto res = avx_reg<value_type>( val );
-    return res;
-}
-
-//#include "vex_proxy.tpp"
+// template<typename T>
+// inline func Val<T>::get_avx_reg(size_t idx) const -> avx_reg<value_type>
+// {
+//     static auto res = avx_reg<value_type>( val );
+//     return res;
+// }
 
 //  VProxy is a thin wrapper around Vex<T> for 
 //  copy elusion & possible operator[] -> __m128 overload
@@ -218,6 +221,7 @@ public:
         return load_sse(&vector[i]);
     }
 
+    __attribute__((target("avx2")))
     func get_avx_reg (size_t i) const -> avx_reg<value_type>
     {
        return load_avx(&vector[i]);
@@ -227,7 +231,6 @@ private:
     Vex<T> const& vector;
 };
 
-#include "SIMD_flags.discard"
 
 
 template <typename V, typename T>
@@ -261,6 +264,6 @@ func add (V v1, U v2) -> vex_op<V,'+',U>
 }
 */
 
-
+//#include "vex_proxy.tpp"
 #undef func
 

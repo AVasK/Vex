@@ -37,7 +37,13 @@ struct VSum {
         return op<'+'>(_r1, _r2);
     }
 
-    auto get_avx_reg (size_t i) const -> avx_reg<value_type>;
+    __attribute__((target("avx2")))
+    auto get_avx_reg (size_t i) const -> avx_reg<value_type>
+    {
+        auto _r1 = load_avx(&v1[i]);
+        auto _r2 = load_avx(&v2[i]);
+        return op<'+'>(_r1, _r2);
+    }
 
     operator Vex<T> ()
     {
@@ -45,8 +51,6 @@ struct VSum {
     }
 
 };
-
-#include "vex2proxy.tpp"
 
 template <typename T>
 struct VISum {
