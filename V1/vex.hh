@@ -23,63 +23,29 @@
 
 
 template<typename T>
-__attribute__((target("avx2")))
 func Vex<T>::operator+= (Vex<T> const& other) -> Vex<T>&
 {
-    //auto n_regs = size_in_registers();
     if (simd_flags() & SIMD::AVX2) {
-        std::cerr << "call to i16_add_avx\n";
+        //std::cerr << "call to i16_add_avx\n";
         add_avx(*this, *this, other);
-        // for (size_t i=0; i < n_regs; ++i)
-        // {
-        //     auto _r1 = load_avx(&this->memory[i * avx_reg<T>::offset]);
-        //     auto _r2 = load_avx(&other.memory[i * avx_reg<T>::offset]);
-        //     auto _res = _r1 + _r2;
-        //     store_avx( &this->memory[i * avx_reg<T>::offset], _res );
-        // }
     }
-    // TODO: Check if SSE2 is available by default on all x64
+    // Add compile-time user-set-flags checking
     else if (simd_flags() & SIMD::SSE2) {
         add_sse(*this, *this, other);
-        // for (size_t i=0; i < n_regs; ++i)
-        // {
-        //     auto _r1 = load_sse(&this->memory[i * sse_reg<T>::offset]);
-        //     auto _r2 = load_sse(&other.memory[i * sse_reg<T>::offset]);
-        //     auto _res = _r1 + _r2;
-        //     store_sse( &this->memory[i * sse_reg<T>::offset], _res );
-        // }
     }
     return *this;
 }
 
 template<typename T>
-__attribute__((target("avx2")))
 func Vex<T>::operator+= (T other) -> Vex<T>&
-{
-    auto n_regs = size_in_registers();
-    
+{   
     if (simd_flags() & SIMD::AVX2) {
         // AVX2
-        for (size_t i=0; i < n_regs; ++i)
-        {
-            //auto _r1 = load_avx(&a[i<<4]);
-            //auto _r2 = _mm256_set1_epi16(value);
-            //auto _res = op<'+'>(_r1, _r2);
-            auto _r1 = load_avx(&this->memory[i*avx_reg<T>::offset]);
-            auto _r2 = avx_reg<T>( other );
-            auto _res = _r1 + _r2;
-            store_avx( &this->memory[i*avx_reg<T>::offset], _res );
-        }
+        addval_avx(*this, *this, other);
     }
     else if (simd_flags() & SIMD::SSE2) {
         // SSE2
-        for (size_t i=0; i < n_regs; ++i)
-        {
-            auto _r1 = load_sse(&this->memory[i*sse_reg<T>::offset]);
-            auto _r2 = sse_reg<T>( other );
-            auto _res = _r1 + _r2;
-            store_sse( &this->memory[i*sse_reg<T>::offset], _res );
-        }
+        addval_sse(*this, *this, other);
     }
     return *this;
 }

@@ -179,17 +179,41 @@ inline void add_avx (
 
 
 template <typename T>
-inline void add_sse (
-                  Vex<T> & res,
-                  Vex<T> const& v1,
-                  Vex<T> const& v2
-                  )
+__attribute__((target("avx2")))
+inline void addval_avx (Vex<T> & res, Vex<T> const& vex, promote_t<T> value)
+{
+    for (size_t i=0; i < vex.size_in_registers(); ++i)
+    {
+        auto _r1 = load_avx(&vex.data()[i*avx_reg<T>::offset]);
+        auto _r2 = avx_reg<T>( T(value) );
+        auto _res = _r1 + _r2;
+        store_avx( &res.data()[i*avx_reg<T>::offset], _res );
+    }
+}
+
+
+
+
+template <typename T>
+inline void add_sse (Vex<T> & res, Vex<T> const& v1, Vex<T> const& v2)
 {
     auto n_regs = v1.size_in_registers();
     for (size_t i=0; i < n_regs; ++i)
     {
         auto _r1 = load_sse(&v1.data()[i * sse_reg<T>::offset]);
         auto _r2 = load_sse(&v2.data()[i * sse_reg<T>::offset]);
+        auto _res = _r1 + _r2;
+        store_sse( &res.data()[i * sse_reg<T>::offset], _res );
+    }
+}
+
+template <typename T>
+inline void addval_sse (Vex<T> & res, Vex<T> const& vex, promote_t<T> value)
+{
+    for (size_t i=0; i < vex.size_in_registers(); ++i)
+    {
+        auto _r1 = load_sse(&vex.data()[i * sse_reg<T>::offset]);
+        auto _r2 = sse_reg<T>( T(value) );
         auto _res = _r1 + _r2;
         store_sse( &res.data()[i * sse_reg<T>::offset], _res );
     }

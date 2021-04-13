@@ -77,7 +77,8 @@ int main() {
         auto t = timing::msTimer("SIMD vex + vex");
         //v += w; // SIMD?
         //v += 7;
-        Vex<i8> r = add(v, w);
+        //Vex<i8> r = add(v, w);
+        v += w;
         //std::cout << r[0] << "\n";
     }
 
@@ -108,9 +109,9 @@ int main() {
         auto t = timing::msTimer("vector");
         res = std::vector<i8>(N);
         for (size_t i=0; i<vv.size(); ++i) {
-            //vv[i] += vw[i];
+            vv[i] += vw[i];
             //vv[i] += 7;
-            res[i] = vv[i] + vw[i];
+            //res[i] = vv[i] + vw[i];
         }
         s += vv[0];
     }
@@ -121,8 +122,8 @@ int main() {
     rand_init(wa, N);
     {
         auto t = timing::msTimer("valarray");
-        std::valarray<i8> res = va + wa;
-        //va += wa;
+        //std::valarray<i8> res = va + wa;
+        va += wa;
         //va += 7;
     }
     
