@@ -105,14 +105,14 @@ static inline auto store_sse(T * mem, sse_reg<T> x) -> void
     _mm_store_si128((__m128i *) mem, x.as_register());
 }
 
-static inline auto store_sse(float * mem, __m128 const& x) -> void
+static inline auto store_sse(float * mem, sse_reg<float> x) -> void
 {
-    _mm_store_ps(mem, x);
+    _mm_store_ps(mem, x.as_register());
 }
 
-static inline auto store_sse(double * mem, __m128d const& x) -> void
+static inline auto store_sse(double * mem, sse_reg<double> x) -> void
 {
-    _mm_store_pd(mem, x);
+    _mm_store_pd(mem, x.as_register());
 }
 
 template <typename T>
@@ -122,14 +122,14 @@ static inline auto store_avx(T * d, avx_reg<T> x) -> void
     _mm256_store_si256((__m256i *)d, x.as_register());
 }
 
-static inline auto store_avx(float * mem, __m256 const& x) -> void
+static inline auto store_avx(float * mem, avx_reg<float> x) -> void
 {
-    _mm256_store_ps(mem, x);
+    _mm256_store_ps(mem, x.as_register());
 }
 
-static inline auto store_avx(double * mem, __m256d const& x) -> void
+static inline auto store_avx(double * mem, avx_reg<double> x) -> void
 {
-    _mm256_store_pd(mem, x);
+    _mm256_store_pd(mem, x.as_register());
 }
 
 

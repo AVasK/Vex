@@ -20,11 +20,51 @@ struct sse_i128 {
     auto as_register() -> __m128i { return data; }
 };
 
+struct sse_float {
+    __m128 data;
+    constexpr const static int offset = 128 / (8*sizeof( float ));
+
+    sse_float (__m128 reg) : data {reg} {}
+    explicit sse_float(float _v) : data{ _mm_set1_ps(_v) } {}
+    operator __m128 () { return data; }
+    auto as_register() -> __m128 { return data; }
+};
+
+struct sse_double {
+    __m128d data;
+    constexpr const static int offset = 16 / sizeof(double);
+
+    sse_double (__m128d reg) : data {reg} {}
+    explicit sse_double(double _v) : data{ _mm_set1_pd(_v) } {}
+    operator __m128d () { return data; }
+    auto as_register() -> __m128d { return data; }
+};
+
 struct avx_i256 {
     __m256i data;
     avx_i256 (__m256i reg) : data{ reg } {}
     operator __m256i () { return data; }
     auto as_register() -> __m256i { return data; }
+};
+
+struct avx_float {
+    __m256 data;
+    constexpr const static int offset = 32 / sizeof(float);
+
+    avx_float (__m256 reg) : data {reg} {}
+    explicit avx_float(float _v) : data{ _mm256_set1_ps(_v) } {}
+    operator __m256 () { return data; }
+    auto as_register() -> __m256 { return data; }
+};
+
+struct avx_double {
+    __m256d data;
+    constexpr const static int offset = 32 / sizeof(double);
+
+    avx_double (__m256d reg) : data {reg} {}
+    explicit avx_double(double _v) : data{ _mm256_set1_pd(_v) } {}
+    operator __m256d () { return data; }
+    auto as_register() -> __m256d { return data; }
 };
 
 // ======== SSE ========
@@ -118,13 +158,13 @@ struct sse_register_type<i64>
 template<>
 struct sse_register_type<float>
 {
-    using type = __m128;
+    using type = sse_float;
 };
 
 template<>
 struct sse_register_type<double>
 {
-    using type = __m128d;
+    using type = sse_double;
 };
 
 // AVX:
@@ -161,11 +201,11 @@ struct avx_register_type<i64>
 template<>
 struct avx_register_type<float>
 {
-    using type = __m256;
+    using type = avx_float;
 };
 
 template<>
 struct avx_register_type<double>
 {
-    using type = __m256d;
+    using type = avx_double;
 };

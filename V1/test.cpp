@@ -24,34 +24,38 @@ bool equal(Vex<T> const& vx, std::vector<T> const& v)
     return true;
 }
 
-#ifdef __SSE4_2__ 
-#error "SSE4.2 flag has leaked into user-space"
-#endif
+// #ifdef __SSE4_2__ 
+// #error "SSE4.2 flag has leaked into user-space"
+// #endif
 
-#ifdef __AVX__ 
-#error "AVX flag has leaked into user-space"
-#endif
+// #ifdef __AVX__ 
+// #error "AVX flag has leaked into user-space"
+// #endif
 
-#ifdef __AVX2__ 
-#error "AVX2 flag has leaked into user-space"
-#endif
+// #ifdef __AVX2__ 
+// #error "AVX2 flag has leaked into user-space"
+// #endif
 
 int main()
 {
-    avx_i8 v8 = 4;
-    sse_u8 w8 = 0;
-    avx_i16 v16 = 0;
+    avx_i8 v8 {4};
+    sse_u8 w8 {0};
+    avx_i16 v16 {0};
     // TESTING:
-    const auto vec3 = std::vector<i16>(10, 3);
-    auto vex3 = Vex<i16>(10, 3);
+    int N = 30;
+    using T = i32;
+    const auto vec3 = std::vector<T>(N, 3);
+    auto vex3 = Vex<T>(N, 3);
+    auto fvex = Vex<float>(N, 3.0);
+    fvex += Vex<float>(N, 0.1415);
     ASSERT_EQ(vex3, vec3);
     std::cout << "vex3 = " << vex3 << "\n";
-    auto vex1 = Vex<i16>(10, 1);
-    auto vex2 = Vex<i16>(10, 2);
-    ASSERT_EQ(Vex<i16>(vex1 + vex2), vec3);
-    std::cout << "vex1 + vex2 = " << Vex<i16>(vex1 + vex2) << "\n";
+    auto vex1 = Vex<T>(N, 1);
+    auto vex2 = Vex<T>(N, 2);
+    ASSERT_EQ(Vex<T>(vex1 + vex2), vec3);
+    std::cout << "vex1 + vex2 = " << Vex<T>(vex1 + vex2) << "\n";
     ASSERT_EQ(vex2 += vex1, vec3);
-    ASSERT_EQ(Vex<i16>(vex1 + 2), vec3); // operator+ (Vex<i16>, int)
+    ASSERT_EQ(Vex<T>(vex1 + 2), vec3); // operator+ (Vex<i16>, int)
     ASSERT_EQ(vex1 += 2, vec3);
     
 }

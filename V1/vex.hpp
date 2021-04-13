@@ -40,19 +40,6 @@ template <typename T>
 struct VISum;
 
 
-/*
-template <typename T>
-func operator+ (Vex<T> const&, Vex<T> const&) -> VSum<T>;
-
-template <typename T>
-func operator+ (Vex<T> const&, T) -> VISum<T>;
-
-template <typename T>
-func operator+ (T, Vex<T> const&) -> VISum<T>;
-
-func operator+ (Vex<float> const&, Vex<float> const&) -> FMAProxy<float>;
-*/
-
 // Friend functions
 template <typename T>
 func vex_add (Vex<T> const&, Vex<T> const&) -> Vex<T>;

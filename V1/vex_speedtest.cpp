@@ -51,20 +51,7 @@ int main() {
     std::valarray<i16> vl4 (4, N);
     std::valarray<i16> rl (N);
 
-    {
-        auto t = timing::msTimer("vector for");
-        for (size_t i=0; i<v1.size(); ++i)
-        {
-            r[i] = v1[i] + v2[i] + v3[i] + 1 + d[i];
-        }
-    }
-
-    long sum {};
-    for (auto& e : r)
-    {
-        sum += e;
-    }
-    std::cout << sum << "\n";
+    
 
     {
         auto t = timing::msTimer("for-loop");
@@ -76,10 +63,10 @@ int main() {
     }
 
     {
-        auto t = timing::msTimer("contiguous for-loop");
-        for (int i=0; i<c1.size(); ++i)
+        auto t = timing::msTimer("vector for");
+        for (size_t i=0; i<v1.size(); ++i)
         {
-            c4[i] = c1[i]+c2[i]+c3[i]+1+d[i];
+            r[i] = v1[i] + v2[i] + v3[i] + 1 + d[i];
         }
     }
 
@@ -89,11 +76,32 @@ int main() {
         //res = a + b;
     }
 
+    long sum {};
+    for (auto& e : r)
+    {
+        sum += e;
+    }
+    std::cout << sum << "\n";
+
+    
+
+    {
+        auto t = timing::msTimer("contiguous for-loop");
+        for (int i=0; i<c1.size(); ++i)
+        {
+            c4[i] = c1[i]+c2[i]+c3[i]+1+d[i];
+        }
+    }
+
+    
+
     {
         auto t = timing::msTimer("valarray");
-        rl = vl1 + vl2 + vl3 + i16(1) + vl4;
+        rl = vl1 + vl2 + vl3 + 1 + vl4;
         //res = a + b;
     }
+
+    
 
     //std::cout << res << "\n";
     std::cout << "PROXY:\n";

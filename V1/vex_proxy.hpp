@@ -176,13 +176,14 @@ private:
     T val;
 };
 
-
 template<typename T>
 inline func Val<T>::get_avx_reg(size_t idx) const -> avx_reg<value_type>
 {
     static auto res = avx_reg<value_type>( val );
     return res;
 }
+
+//#include "vex_proxy.tpp"
 
 //  VProxy is a thin wrapper around Vex<T> for 
 //  copy elusion & possible operator[] -> __m128 overload
@@ -235,10 +236,10 @@ func add (V const& vex, T val) -> vex_op<V,'+', Val<T>>
     return vex_op< V,'+',Val<T> >( vex, Val<T>(val) );
 }
 
-template <typename V, typename T>
-func add (V const& proxy, Vex<T> const& v2) -> vex_op<V,'+', VProxy<T>>
+template <typename P, typename T>
+func add (P const& proxy, Vex<T> const& v2) -> vex_op<P,'+', VProxy<T>>
 {
-    return vex_op< V,'+',VProxy<T> >( proxy, VProxy<T>(v2) );
+    return vex_op< P,'+',VProxy<T> >( proxy, VProxy<T>(v2) );
 }
 
 template <typename T>
@@ -260,18 +261,6 @@ func add (V v1, U v2) -> vex_op<V,'+',U>
 }
 */
 
-/*
-int main() 
-{
-    Vex<i16> a(10, 3);
-    Vex<i16> b(10, 1);
 
-    Vex<i16> res = add( add( add((a+b), (i16)1), (i16)3), (i16)3);
-    std::cout << res;
-
-    //auto vp = VProxy<i16>(a + (i16)1 + b);
-    //auto cvp = vp;
-}
-*/
 #undef func
 

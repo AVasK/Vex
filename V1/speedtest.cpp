@@ -66,7 +66,7 @@ int main() {
         
     
     auto v = Vex<i8>(N, 'a'); // [7] * 14
-    auto w = Vex<i8>(N, 1); // [2] * 14
+    auto w = Vex<i8>(N, 2); // [2] * 14
     //v+=w;
     
     //rand_init(v, N);
@@ -77,20 +77,30 @@ int main() {
         auto t = timing::msTimer("SIMD vex + vex");
         //v += w; // SIMD?
         //v += 7;
-        Vex<i8> r = v + w;
-        //std::cout << r << "\n";
+        Vex<i8> r = add(v, w);
+        //std::cout << r[0] << "\n";
     }
 
     {
         auto t = timing::msTimer("SIMD proxy vex <+> vex");
         //v += w; // SIMD?
         //v += 7;
-        Vex<i8> r = add(v, w);
-        //std::cout << r << "\n";
+        Vex<i8> r = v + w;
+        /*
+        auto val = r[0];
+        for (size_t i = 0; i < N; i++)
+        {
+            if (r[i] != r[0])
+            {
+                std::cerr << "ERR!\n";
+                return 1;
+            }
+        }
+        */
     }
     
-    auto vv = std::vector<i8> (N, 0);
-    auto vw = std::vector<i8> (N, 0);
+    auto vv = std::vector<i8> (N, 'a');
+    auto vw = std::vector<i8> (N, 2);
     std::vector<i8> res;
     rand_init(vv, N);
     rand_init(vw, N);
@@ -105,8 +115,8 @@ int main() {
         s += vv[0];
     }
     
-    auto va = std::valarray<i8> (1, N);
-    auto wa = std::valarray<i8> (1, N);
+    auto va = std::valarray<i8> ('a', N);
+    auto wa = std::valarray<i8> (2, N);
     rand_init(va, N);
     rand_init(wa, N);
     {
