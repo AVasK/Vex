@@ -23,7 +23,9 @@
 #include "cctools.hpp"
 #include "aligned_array.hpp"
 #include "integers.hpp"
+#include "simd_types.hpp"
 #include "simd_ops.hpp"
+#include "vex_ops.hpp"
 #include "x86_cpuid.hpp"
 
 #define func auto
@@ -105,6 +107,16 @@ public:
     func size_in_avx_regs() const -> size_t
     {
         return memory.size_in_avx_regs();
+    }
+
+    func get_avx_reg(size_t at_idx) const -> avx_reg<value_type>
+    {
+        return load_avx(&memory[at_idx]);
+    }
+
+    func get_sse_reg(size_t at_idx) const -> sse_reg<value_type>
+    {
+        return load_sse(&memory[at_idx]);
     }
     
     //__attribute__((always_inline))

@@ -24,6 +24,7 @@
 #include <type_traits>
 #include <limits>
 #include "vex.hpp"
+#include "intrin_funcs.hh"
 #include "simd_ops.hpp"
 #include "simd_types.hpp"
 
@@ -80,7 +81,7 @@ struct vex_op
     {
         auto _r1 = v1.get_sse_reg(idx);
         auto _r2 = v2.get_sse_reg(idx);
-        return op<'+'>(_r1, _r2);
+        return op<opcode>(_r1, _r2);
     }
 
     __attribute__((target("avx2")))
@@ -88,7 +89,7 @@ struct vex_op
     {
         auto _r1 = v1.get_avx_reg(idx);
         auto _r2 = v2.get_avx_reg(idx);
-        return op<'+'>(_r1, _r2);
+        return op<opcode>(_r1, _r2);
     }
 
     __attribute__((target("avx2")))

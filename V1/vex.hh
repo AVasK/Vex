@@ -26,7 +26,6 @@ template<typename T>
 func Vex<T>::operator+= (Vex<T> const& other) -> Vex<T>&
 {
     if (simd_flags() & SIMD::AVX2) {
-        //std::cerr << "call to i16_add_avx\n";
         add_avx(*this, *this, other);
     }
     // Add compile-time user-set-flags checking
@@ -51,73 +50,37 @@ func Vex<T>::operator+= (T other) -> Vex<T>&
 }
 
 template <typename T>
-__attribute__((target("avx2")))
-func vex_add (Vex<T> const& a1, Vex<T> const& a2) -> Vex<T>
+func vex_add (Vex<T> const& v1, Vex<T> const& v2) -> Vex<T>
 {
-    // TODO: add min_size to for-loop part, mb try to make more generic...
-    //auto len = std::min(a1.size(), a2.size());
-    Vex<T> res (a1.size());
-    auto n_regs = std::min(a1.size_in_registers(), a2.size_in_registers());
+    Vex<T> res (v1.size());
+    auto n_regs = std::min(v1.size_in_registers(), v2.size_in_registers());
 
-    if (a1.simd_flags() & SIMD::AVX2) {
-        //i16_add_avx(res, a1, a2);
-        for (size_t i=0; i < n_regs; ++i)
-        {
-            auto _r1 = load_avx(&a1[i * avx_reg<T>::offset]);
-            auto _r2 = load_avx(&a2[i * avx_reg<T>::offset]);
-            auto _res = _r1 + _r2;
-            store_avx( &res[i * avx_reg<T>::offset], _res);
-        }
+    if (Vex<T>::simd_flags() & SIMD::AVX2) {
+        add_avx(res, v1, v2);
     }
-    else if (a1.simd_flags() & SIMD::SSE2) {
-        //i16_add_sse(res, a1, a2);
-        for (size_t i=0; i < n_regs; ++i)
-        {
-            auto _r1 = load_sse(&a1[i * sse_reg<T>::offset]);
-            auto _r2 = load_sse(&a2[i * sse_reg<T>::offset]);
-            auto _res = _r1 + _r2;
-            store_sse( &res[i * sse_reg<T>::offset], _res);
-        }
+    else if (Vex<T>::simd_flags() & SIMD::SSE2) {
+        add_sse(res, v1, v2);
     }
     return res;
 }
 
 
 template<typename T>
-__attribute__((target("avx2")))
-inline func vex_add (Vex<T> const& a, T value) -> Vex<T>
+inline func vex_add (Vex<T> const& vex, T value) -> Vex<T>
 {
-    auto n_regs = a.size_in_registers();
-    Vex<T> res (a.size());
+    auto n_regs = vex.size_in_registers();
+    Vex<T> res (vex.size());
     
-    if (a.simd_flags() & SIMD::AVX2) {
-        // AVX2
-        for (size_t i=0; i < n_regs; ++i)
-        {
-            //auto _r1 = load_avx(&a[i<<4]).as_register();
-            //auto _r2 = _mm256_set1_epi16(value);
-            //auto _res = _mm256_adds_epi16(_r1, _r2);
-            auto _r1 = load_avx(&a[i * avx_reg<T>::offset]);
-            auto _r2 = avx_reg<T>( value );
-            auto _res = _r1 + _r2;
-            store_avx( &res[i * avx_reg<T>::offset], _res);
-        }
+    if (Vex<T>::simd_flags() & SIMD::AVX2) {
+        addval_avx(res, vex, value);
     }
-    else if (a.simd_flags() & SIMD::SSE2) {
-        // SSE2
-        for (size_t i=0; i < n_regs; ++i)
-        {
-            auto _r1 = load_sse(&a[i * sse_reg<T>::offset]);
-            auto _r2 = sse_reg<T>( value );
-            auto _res = _r1 + _r2;
-            store_sse( &res[i * sse_reg<T>::offset], _res);
-        }
+    else if (Vex<T>::simd_flags() & SIMD::SSE2) {
+        addval_sse(res, vex, value);
     }
     return res;
 }
 
 template<typename T>
-__attribute__((target("avx2")))
 func vex_add (T value, Vex<T> const& vex) -> Vex<T>
 {
     return vex_add(vex, value);

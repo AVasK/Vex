@@ -44,6 +44,7 @@ struct sse_double {
 struct avx_i256 {
     __m256i data;
 
+    __attribute__((target("avx2")))
     avx_i256 (__m256i reg) : data{ reg } {}
 
     __attribute__((target("avx2")))
@@ -57,8 +58,10 @@ struct avx_float {
     __m256 data;
     constexpr const static int offset = 32 / sizeof(float);
 
+    __attribute__((target("avx2")))
     avx_float (__m256 reg) : data {reg} {}
 
+    __attribute__((target("avx2")))
     explicit avx_float(float _v) : data{ _mm256_set1_ps(_v) } {}
 
     __attribute__((target("avx2"))) 
@@ -72,8 +75,10 @@ struct avx_double {
     __m256d data;
     constexpr const static int offset = 32 / sizeof(double);
 
+    __attribute__((target("avx2")))
     avx_double (__m256d reg) : data {reg} {}
 
+    __attribute__((target("avx2")))
     explicit avx_double(double _v) : data{ _mm256_set1_pd(_v) } {}
 
     __attribute__((target("avx2")))
