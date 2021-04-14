@@ -139,13 +139,8 @@ struct wrap_vex {
 };
 
 template <typename T>
-struct wrap_vex<VProxy<T>> {
-    using type = VProxy<typename T::value_type>;
-};
-
-template <typename T>
-struct wrap_vex<VSum<T>> {
-    using type = VSum<typename T::value_type>;
+struct wrap_vex<Vex<T>> {
+    using type = VProxy<T>;
 };
 
 #define DEF_WRAP_VEX(T)     \
@@ -167,10 +162,16 @@ using wrap_t = typename wrap_vex<T>::type;
 
 using t1 = wrap_vex<i8>::type;
 using t2 = wrap_vex<Vex<i8>>::type;
-using t3 = wrap_vex<VSum<Vex<i8>>>::type;
+using t3 = wrap_vex<VSum<i8>>::type;
 using t4 = wrap_vex<vex_op<Vex<i8>,'+',Val<i8>>>::type;
 
-// operator+ (Wrap<V1>, Wrap<V2>) -> vex_op<Wrap<V1>,'+',Wrap<V2>
-// where wrap_t = VSum if V == VSum
-//              = Val  if V is numeric
-//              = VProxy otherwise
+// operator+ (wrap_t<V1>, wrap_t<V2>) -> vex_op<Wrap<V1>,'+',Wrap<V2>
+// where wrap_t<V> = VProxy<T> if V == Vex<T>
+//                 = Val<T> if V is arithmetic
+//                 = V otherwise
+
+template <typename V1, typename V2>
+auto operator+ (wrap_t<V1> v1, wrap_t<V2> v2) -> vex_op<wrap_t<V1>,'+',wrap_t<V2>>
+{
+    return vex_op<wrap_t<V1>,'+',wrap_t<V2>>( v1, v2 );
+}
