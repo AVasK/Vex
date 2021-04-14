@@ -53,7 +53,6 @@ template <typename T>
 func vex_add (Vex<T> const& v1, Vex<T> const& v2) -> Vex<T>
 {
     Vex<T> res (v1.size());
-    auto n_regs = std::min(v1.size_in_registers(), v2.size_in_registers());
 
     if (Vex<T>::simd_flags() & SIMD::AVX2) {
         add_avx(res, v1, v2);
@@ -68,7 +67,6 @@ func vex_add (Vex<T> const& v1, Vex<T> const& v2) -> Vex<T>
 template<typename T>
 inline func vex_add (Vex<T> const& vex, T value) -> Vex<T>
 {
-    auto n_regs = vex.size_in_registers();
     Vex<T> res (vex.size());
     
     if (Vex<T>::simd_flags() & SIMD::AVX2) {

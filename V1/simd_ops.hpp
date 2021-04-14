@@ -59,6 +59,12 @@ auto operator+ (avx_i8 r1, avx_i8 r2) -> avx_i8
 }
 
 __attribute__((target("avx2")))
+auto operator+ (avx_u8 r1, avx_u8 r2) -> avx_u8
+{
+    return avx_u8(_mm256_adds_epu8(r1, r2));
+}
+
+__attribute__((target("avx2")))
 auto operator+ (avx_i16 r1, avx_i16 r2) -> avx_i16
 {
     return avx_i16(_mm256_add_epi16(r1, r2));

@@ -19,36 +19,18 @@
 // SOFTWARE.
 
 #pragma once
-// vex proxy wrappers
+
 #include <iostream>
 #include <type_traits>
 #include <limits>
-#include "vex.hpp"
-#include "intrin_funcs.hh"
+//#include "vex.hpp"
+//#include "intrin_funcs.hh"
 #include "simd_types.hpp"
 #include "simd_ops.hpp"
-#include "vex_ops.hpp"
+#include "vex_ops.hpp" 
+#include "vex_proxy_ops.hpp" // eval_op<opcode>::compute 
 
 #define func auto
-
-template <char opcode>
-struct eval_op {};
-
-template<>
-struct eval_op<'+'> {
-    template <typename T, typename V1, typename V2>
-    static inline void compute(Vex<T> & res, V1 const& v1, V2 const& v2)
-    {
-        auto flags = Vex<T>::simd_flags();
-        if ( flags & SIMD::AVX2 )
-        { 
-            add_avx(res, v1, v2);
-        }
-        else {
-            add_sse(res, v1, v2);
-        }
-    }
-};
 
 ////////// VEX_OP ////////////////
 // minimal interface for T1 & T2:
@@ -135,10 +117,6 @@ public:
     : val {_val}
     {}
 
-    // Val(promote_t<T> _val)
-    // : val (_val) //potential narrowing
-    // {}
-
     func operator[] (size_t) const -> value_type
     {
         return val;
@@ -173,15 +151,8 @@ private:
     T val;
 };
 
-// template<typename T>
-// inline func Val<T>::get_avx_reg(size_t idx) const -> avx_reg<value_type>
-// {
-//     static auto res = avx_reg<value_type>( val );
-//     return res;
-// }
 
-//  VProxy is a thin wrapper around Vex<T> for 
-//  copy elusion & possible operator[] -> __m128 overload
+//  VProxy is a thin wrapper around Vex<T> to avoid copying when passing in expression templates
 template <typename T>
 class VProxy {
 public:
@@ -224,38 +195,5 @@ private:
 };
 
 
-
-template <typename V, typename T>
-func add (V const& vex, T val) -> vex_op<V,'+', Val<T>>
-{
-    return vex_op< V,'+',Val<T> >( vex, Val<T>(val) );
-}
-
-template <typename P, typename T>
-func add (P const& proxy, Vex<T> const& v2) -> vex_op<P,'+', VProxy<T>>
-{
-    return vex_op< P,'+',VProxy<T> >( proxy, VProxy<T>(v2) );
-}
-
-template <typename T>
-func add (Vex<T> const& vex, T val) -> vex_op<VProxy<T>,'+', Val<T>>
-{
-    return vex_op< VProxy<T>,'+',Val<T> >( VProxy<T>(vex), Val<T>(val) );
-}
-
-template <typename T>
-func add (Vex<T> const& v1, Vex<T> const& v2) -> vex_op<VProxy<T>,'+',VProxy<T>>
-{
-    return vex_op< VProxy<T>,'+',VProxy<T> >( VProxy<T>(v1), VProxy<T>(v2) );
-}
-/*
-template <typename V, typename U>
-func add (V v1, U v2) -> vex_op<V,'+',U>
-{
-    return vex_op< V,'+',U >( v1, v2 );
-}
-*/
-
-//#include "vex_proxy.tpp"
 #undef func
 
