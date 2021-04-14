@@ -1,4 +1,6 @@
 // <-> Included into vex.hpp
+#pragma once
+
 #include "vex_proxy.hpp"
 #include "simd_types.hpp"
 
@@ -93,7 +95,7 @@ auto operator+ (promote_t<T> val, Vex<T> const& v) -> VISum<T>
     return VISum<T>(v, T(val));
 }
 
-
+/*
 // VSum / VISum to vex_op in case where there are more additions/subtractions e.t.c
 template <typename T, template<typename> class Vexlike>
 auto operator+ (VSum<T> const& vsum, Vexlike<T> const& vexlike) -> vex_op<VSum<T>,'+',Vexlike<T>>
@@ -129,3 +131,46 @@ auto operator+ (Vexlike const& vexlike, Vex<_vtype> const& vex) -> vex_op<Vexlik
 {
     return vex_op<Vexlike,'+',VProxy<_vtype>>( vexlike, VProxy<_vtype>(vex) );
 }
+*/
+
+template <typename T>
+struct wrap_vex {
+    using type = T;
+};
+
+template <typename T>
+struct wrap_vex<VProxy<T>> {
+    using type = VProxy<typename T::value_type>;
+};
+
+template <typename T>
+struct wrap_vex<VSum<T>> {
+    using type = VSum<typename T::value_type>;
+};
+
+#define DEF_WRAP_VEX(T)     \
+template <>                 \
+struct wrap_vex<T> {        \
+    using type = Val<T>;    \
+};                          \
+
+DEF_WRAP_VEX(i8)
+DEF_WRAP_VEX(u8)
+DEF_WRAP_VEX(i16)
+DEF_WRAP_VEX(i32)
+DEF_WRAP_VEX(i64)
+DEF_WRAP_VEX(float)
+DEF_WRAP_VEX(double)
+
+template <typename T>
+using wrap_t = typename wrap_vex<T>::type;
+
+using t1 = wrap_vex<i8>::type;
+using t2 = wrap_vex<Vex<i8>>::type;
+using t3 = wrap_vex<VSum<Vex<i8>>>::type;
+using t4 = wrap_vex<vex_op<Vex<i8>,'+',Val<i8>>>::type;
+
+// operator+ (Wrap<V1>, Wrap<V2>) -> vex_op<Wrap<V1>,'+',Wrap<V2>
+// where wrap_t = VSum if V == VSum
+//              = Val  if V is numeric
+//              = VProxy otherwise
