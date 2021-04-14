@@ -170,8 +170,10 @@ using t4 = wrap_vex<vex_op<Vex<i8>,'+',Val<i8>>>::type;
 //                 = Val<T> if V is arithmetic
 //                 = V otherwise
 
-template <typename V1, typename V2>
-auto operator+ (wrap_t<V1> v1, wrap_t<V2> v2) -> vex_op<wrap_t<V1>,'+',wrap_t<V2>>
+template <typename V1, typename V2, 
+          typename = decltype(std::declval<V1>().get_avx_reg(0))
+         >
+auto operator+ (V1 const& v1, V2 const& v2) -> vex_op<wrap_t<V1>,'+',wrap_t<V2>>
 {
     return vex_op<wrap_t<V1>,'+',wrap_t<V2>>( v1, v2 );
 }

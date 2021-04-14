@@ -64,13 +64,13 @@ int main() {
 
     {
         auto t = timing::msTimer("a + b");
-        res = a + b + c + 1;
+        res = a + b + c + i16(1);
         //res = a + b;
     }
 
     {
         auto t = timing::msTimer("a + b");
-        res = a + b + c + 1;
+        res = a + b + c + i16(1);
         //res = a + b;
     }
 

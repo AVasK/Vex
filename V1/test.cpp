@@ -53,6 +53,8 @@ int main()
     auto vex1 = Vex<T>(N, 1);
     auto vex2 = Vex<T>(N, 2);
     ASSERT_EQ(Vex<T>(vex1 + vex2), vec3);
+    std::vector<T> vec7 (N, 7);
+    ASSERT_EQ(Vex<T>(vex1 + vex2 + vex3 + 1), vec7);
     std::cout << "vex1 + vex2 = " << Vex<T>(vex1 + vex2) << "\n";
     ASSERT_EQ(vex2 += vex1, vec3);
     ASSERT_EQ(Vex<T>(vex1 + 2), vec3); // operator+ (Vex<i16>, int)
