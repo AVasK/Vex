@@ -1,3 +1,4 @@
+// @: SIMD load/store ops [RENAME FILE?]
 // Copyright (c) 2021 Alex Vaskov
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -138,24 +139,3 @@ static inline auto store_avx(double * mem, avx_reg<double> x) -> void
 {
     _mm256_store_pd(mem, x.as_register());
 }
-
-
-/* ##############################################
-auto n_regs = a1.size_in_registers();
-for (size_t i=0; i < n_regs; ++i)
-{
-    //FIXME: Need separate function to get register start address.
-    // load #elems_per_reg consecutive elements from a1:
-    auto _a1 = iload_256(&a1[i<<4]);
-    
-    auto _a2 = iload_256(&a2[i<<4]);
-    
-    auto _res = _mm256_add_epi16(_a1, _a2);
-    
-    store_avx(&res[i<<4], _res);
-    //_mm256_zeroupper();
-}
-*/
-
-// FUNCS:
-

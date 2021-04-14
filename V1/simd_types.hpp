@@ -1,11 +1,29 @@
+// @: SIMD wrapper types
+// Copyright (c) 2021 Alex Vaskov
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #pragma once
+
 #include "integers.hpp"
 #include "intrinsics.hpp"
 #include <type_traits>
-
-
-#define VEX_AVX
-#define VEX_SSE
 
 
 template <typename T>
@@ -103,7 +121,6 @@ struct avx_double {
 };
 
 // ======== SSE ========
-#ifdef VEX_SSE
 struct sse_i8  : sse_i128 {
     explicit sse_i8(i8 _v) : sse_i128{ _mm_set1_epi8(_v) } {}
     explicit sse_i8(__m128i reg) : sse_i128{ reg } {}
@@ -128,12 +145,8 @@ struct sse_i64 : sse_i128 {
     explicit sse_i64(i64 _v) : sse_i128{ _mm_set1_epi64x(_v) } {}
     explicit sse_i64(__m128i reg) : sse_i128{ reg } {}
 };
-#endif // VEX_SSE
-
 
 // ======== AVX ========
-#ifdef VEX_AVX
-
 struct avx_i8  : avx_i256 {
     __attribute__((target("avx2")))
     explicit avx_i8(i8 _v) : avx_i256{ _mm256_set1_epi8(_v) } {}
@@ -173,8 +186,6 @@ struct avx_i64 : avx_i256 {
     __attribute__((target("avx2")))
     explicit avx_i64(__m256i reg) : avx_i256{ reg } {}
 };
-
-#endif // VEX_AVX
 
 
 // SSE_REGISTER template:

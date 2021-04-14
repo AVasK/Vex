@@ -1,3 +1,4 @@
+// @: Vex header file
 // Copyright (c) 2021 Alex Vaskov
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,8 +30,6 @@
 #include "x86_cpuid.hpp"
 
 #define func auto
-
-
 
 // FORWARD DECLARATION
 template <typename T>

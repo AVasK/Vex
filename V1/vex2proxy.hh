@@ -1,4 +1,4 @@
-// Included into vex.hpp
+// <-> Included into vex.hpp
 #include "vex_proxy.hpp"
 #include "simd_types.hpp"
 

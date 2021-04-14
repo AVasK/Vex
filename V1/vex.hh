@@ -1,3 +1,4 @@
+// @: Vex template implementation file
 // Copyright (c) 2021 Alex Vaskov
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -83,14 +84,6 @@ func vex_add (T value, Vex<T> const& vex) -> Vex<T>
 {
     return vex_add(vex, value);
 }
-
-/*
-template<typename Func>
-func Vex<i16>::map (Func f)
-{
-    return *this;//TODO: write function body
-}
- */
 
 
 template <typename T>

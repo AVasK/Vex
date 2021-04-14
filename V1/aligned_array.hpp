@@ -1,3 +1,4 @@
+// @: Aligned Contiguous Memory header & implementation
 // Copyright (c) 2021 Alex Vaskov
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy

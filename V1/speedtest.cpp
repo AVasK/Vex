@@ -10,19 +10,18 @@
 
 #include "vex_proxy.hpp"
 
-/*
-#ifdef __SSE4_2__ 
-#error "SSE4.2 flag has leaked into user-space"
-#endif
+// #ifdef __SSE4_2__ 
+// #error "SSE4.2 flag has leaked into user-space"
+// #endif
 
-#ifdef __AVX__ 
-#error "AVX flag has leaked into user-space"
-#endif
+// #ifdef __AVX__ 
+// #error "AVX flag has leaked into user-space"
+// #endif
 
-#ifdef __AVX2__ 
-#error "AVX2 flag has leaked into user-space"
-#endif
-*/
+// #ifdef __AVX2__ 
+// #error "AVX2 flag has leaked into user-space"
+// #endif
+
 
 template <typename T>
 void rand_init(T & array_like, size_t N)
