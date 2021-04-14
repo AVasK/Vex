@@ -25,11 +25,30 @@
 #include <limits>
 #include "vex.hpp"
 #include "intrin_funcs.hh"
-#include "simd_ops.hpp"
 #include "simd_types.hpp"
+#include "simd_ops.hpp"
+#include "vex_ops.hpp"
 
 #define func auto
 
+template <char opcode>
+struct eval_op {};
+
+template<>
+struct eval_op<'+'> {
+    template <typename T, typename V1, typename V2>
+    static inline void compute(Vex<T> & res, V1 const& v1, V2 const& v2)
+    {
+        auto flags = Vex<T>::simd_flags();
+        if ( flags & SIMD::AVX2 )
+        { 
+            add_avx(res, v1, v2);
+        }
+        else {
+            add_sse(res, v1, v2);
+        }
+    }
+};
 
 ////////// VEX_OP ////////////////
 // minimal interface for T1 & T2:
@@ -92,47 +111,19 @@ struct vex_op
         return op<opcode>(_r1, _r2);
     }
 
-    __attribute__((target("avx2")))
+
     func eval() const -> Vex<value_type>
     {
-        auto flags = Vex<value_type>::simd_flags();
         auto len = this->size();
-        auto n_regs = this->size_in_registers();
         Vex<value_type> res (len);
-
-        if (flags & SIMD::AVX)
-        {
-            for (size_t i = 0; i < n_regs; ++i)
-            {
-                auto _r1 = v1.get_avx_reg(i * avx_reg<value_type>::offset);
-                auto _r2 = v2.get_avx_reg(i * avx_reg<value_type>::offset);
-                auto _res = op<opcode>(_r1, _r2);
-                store_avx( &res[i * avx_reg<value_type>::offset], _res );
-            }
-        }
-        else 
-        { 
-            #if ARCH_x86_64
-            for (size_t i = 0; i < n_regs; ++i)
-            {
-                auto _r1 = v1.get_sse_reg(i * sse_reg<value_type>::offset);
-                auto _r2 = v2.get_sse_reg(i * sse_reg<value_type>::offset);
-                auto _res = op<opcode>(_r1, _r2);
-                store_sse( &res[i * sse_reg<value_type>::offset], _res );
-            }
-            #elif ARCH_x86_32
-            for (size_t i = 0; i < len; ++i)
-            {
-                res[i] = v1[i] + v2[i];
-            }
-            #endif
-        }
+        eval_op<opcode>::compute(res, v1, v2);
         return res;
     }
 
     T1 const v1;
     T2 const v2;
 };
+
 
 
 template <typename T>
