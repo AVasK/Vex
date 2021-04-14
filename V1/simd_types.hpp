@@ -21,9 +21,9 @@
 
 #pragma once
 
+#include <type_traits>
 #include "integers.hpp"
 #include "intrinsics.hpp"
-#include <type_traits>
 
 
 template <typename T>
