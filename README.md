@@ -7,6 +7,6 @@
 - [x] Vectorization, e.t.c
 - [x] Proxy class for efficient chaining of operations
 - [ ] Masking: [ extern vex<i16> a; a[a >= 0] = ... ]
-- [ ] Add mul/div/max/other ops
-- [ ] Optimize
+- [x] Add mul/div/max/other ops
+- [x] Optimize
 - [ ] Cleanup! 
