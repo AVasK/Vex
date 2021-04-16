@@ -60,6 +60,15 @@ func vex_sub (Vex<T> const&, T) -> Vex<T>;
 template <typename T>
 func vex_sub (T, Vex<T> const&) -> Vex<T>;
 
+template <typename T>
+func vex_mul (Vex<T> const&, Vex<T> const&) -> Vex<T>;
+
+template <typename T>
+func vex_mul (Vex<T> const&, T) -> Vex<T>;
+
+template <typename T>
+func vex_mul (T, Vex<T> const&) -> Vex<T>;
+
 
 // Vex class
 template <typename T>
@@ -173,9 +182,14 @@ public:
     friend func vex_add<T> (Vex const& a1, Vex const& a2) -> Vex;
     friend func vex_add<T> (Vex const& a1, T value) -> Vex;
     friend func vex_add<T> (T value, Vex const& a1) -> Vex;
+
     friend func vex_sub<T> (Vex const& a1, Vex const& a2) -> Vex;
     friend func vex_sub<T> (Vex const& a1, T value) -> Vex;
     friend func vex_sub<T> (T value, Vex const& a1) -> Vex;
+
+    friend func vex_mul<T> (Vex const& a1, Vex const& a2) -> Vex;
+    friend func vex_mul<T> (Vex const& a1, T value) -> Vex;
+    friend func vex_mul<T> (T value, Vex const& a1) -> Vex;
     
 protected:
     Contiguous<T> memory;

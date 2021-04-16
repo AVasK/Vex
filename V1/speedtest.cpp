@@ -85,32 +85,34 @@ int main() {
         auto t = timing::msTimer("SIMD proxy vex <+> vex");
         //v += w; // SIMD?
         //v += 7;
-        Vex<i8> r = v + w;
+        Vex<i8> r = v * i8(7);
     }
     
     auto vv = std::vector<i8> (N, 'a');
     auto vw = std::vector<i8> (N, 2);
     std::vector<i8> res;
-    rand_init(vv, N);
-    rand_init(vw, N);
+    //rand_init(vv, N);
+    //rand_init(vw, N);
     {
         auto t = timing::msTimer("vector");
         res = std::vector<i8>(N);
         for (size_t i=0; i<vv.size(); ++i) {
             //vv[i] += vw[i];
             //vv[i] += 7;
-            res[i] = vv[i] + vw[i];
+            //res[i] = vv[i] + vw[i];
+            res[i] = vv[i] * i8(7);
         }
         s += vv[0];
     }
     
     auto va = std::valarray<i8> ('a', N);
     auto wa = std::valarray<i8> (2, N);
-    rand_init(va, N);
-    rand_init(wa, N);
+    //rand_init(va, N);
+    //rand_init(wa, N);
     {
         auto t = timing::msTimer("valarray");
-        std::valarray<i8> res = va + wa;
+        std::valarray<i8> res = va * i8(7);
+        //std::valarray<i8> res = va + wa;
         //va += wa;
         //va += 7;
     }

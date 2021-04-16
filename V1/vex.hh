@@ -21,7 +21,10 @@
 
 #pragma once
 #include "intrin_funcs.hh"
+#include "vex_proxy.hpp"
 
+
+#define func auto
 
 // ===============================
 // ========== Addition ===========
@@ -162,6 +165,107 @@ func vex_sub (T value, Vex<T> const& vex) -> Vex<T>
 }
 
 
+// ===============================
+// ======= Multiplication ========
+// ===============================
+
+
+template<typename T>
+func Vex<T>::operator*= (Vex<T> const& other) -> Vex<T>&
+{
+    if (simd_flags() & SIMD::AVX2) {
+        mul_avx(*this, *this, other);
+    }
+    // Add compile-time user-set-flags checking
+    else if (simd_flags() & SIMD::SSE2) {
+        mul_sse(*this, *this, other);
+    }
+    return *this;
+}
+
+
+template<typename T>
+func Vex<T>::operator*= (T other) -> Vex<T>&
+{   
+    if (simd_flags() & SIMD::AVX2) {
+        // AVX2
+        mulval_avx(*this, *this, other);
+    }
+    else if (simd_flags() & SIMD::SSE2) {
+        // SSE2
+        mulval_sse(*this, *this, other);
+    }
+    return *this;
+}
+
+
+// i32:
+template<>
+func Vex<i32>::operator*= (Vex<i32> const& other) -> Vex<i32>&
+{
+    if (simd_flags() & SIMD::AVX2) {
+        mul_avx(*this, *this, other);
+    }
+    else if (simd_flags() & SIMD::SSE4_1) {
+        mul_sse(*this, *this, other);
+    }
+    else {
+        std::cout << "ERROR: no sse4.1\n";
+    }
+    return *this;
+}
+
+
+template<>
+func Vex<i32>::operator*= (i32 other) -> Vex<i32>&
+{   
+    if (simd_flags() & SIMD::AVX2) {
+        mul_avx(*this, *this, Val<i32>(other));
+    }
+    else if (simd_flags() & SIMD::SSE4_1) {
+        mul_sse(*this, *this, Val<i32>(other));
+    }
+    return *this;
+}
+
+
+template <typename T>
+func vex_mul (Vex<T> const& v1, Vex<T> const& v2) -> Vex<T>
+{
+    Vex<T> res (v1.size());
+
+    if (Vex<T>::simd_flags() & SIMD::AVX2) {
+        mul_avx(res, v1, v2);
+    }
+    else if (Vex<T>::simd_flags() & SIMD::SSE2) {
+        mul_sse(res, v1, v2);
+    }
+    return res;
+}
+
+
+template<typename T>
+inline func vex_mul (Vex<T> const& vex, T value) -> Vex<T>
+{
+    Vex<T> res (vex.size());
+    
+    if (Vex<T>::simd_flags() & SIMD::AVX2) {
+        mulval_avx(res, vex, value);
+    }
+    else if (Vex<T>::simd_flags() & SIMD::SSE2) {
+        mulval_sse(res, vex, value);
+    }
+    return res;
+}
+
+template<typename T>
+func vex_mul (T value, Vex<T> const& vex) -> Vex<T>
+{
+    return vex_mul(vex, value);
+}
+
+
+// Overload for i32 case:
 
 
 template <typename T>

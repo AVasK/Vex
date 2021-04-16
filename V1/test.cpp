@@ -43,7 +43,8 @@ int main()
     avx_i16 v16 {0};
     // TESTING:
     int N = 30;
-    using T = i32;
+    using T = i8;
+    const auto vec7 = std::vector<T>(N, 7);
     const auto vec3 = std::vector<T>(N, 3);
     const auto vec1 = std::vector<T>(N, 1);
     auto vex3 = Vex<T>(N, 3);
@@ -52,15 +53,16 @@ int main()
     ASSERT_EQ(vex3, vec3);
     auto vex1 = Vex<T>(N, 1);
     auto vex2 = Vex<T>(N, 2);
-    ASSERT_EQ(Vex<T>(1 + vex2), vec3);
-    ASSERT_EQ(Vex<T>(vex2 + 1), vec3);
+    ASSERT_EQ(Vex<T>(T(1) + vex2), vec3);
+    ASSERT_EQ(Vex<T>(vex2 + T(1)), vec3);
     ASSERT_EQ(Vex<T>(vex1 + vex2), vec3);
-    std::vector<T> vec7 (N, 7);
-    ASSERT_EQ(Vex<T>(vex1 + vex2 + vex3 + 1), vec7);
+    ASSERT_EQ(Vex<T>(vex1 + vex2 + vex3 + T(1)), vec7);
     ASSERT_EQ(Vex<T>(vex3 - vex2), vec1);
+    ASSERT_EQ(Vex<T>(vex1 + T(2)*vex3), vec7);
+
     ASSERT_EQ(vex2 += vex1, vec3);
     ASSERT_EQ(vex1, vec1);
-    ASSERT_EQ(Vex<T>(vex1 + 2), vec3); // operator+ (Vex<i16>, int)
+    ASSERT_EQ(Vex<T>(vex1 + T(2)), vec3); // operator+ (Vex<i16>, int)
     ASSERT_EQ(vex1 += 2, vec3);
     
 }
