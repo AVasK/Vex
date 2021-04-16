@@ -139,6 +139,7 @@ auto operator* (sse_i16 r1, sse_i16 r2) -> sse_i16
 __attribute__((target("sse4.1")))
 auto operator* (sse_i32 r1, sse_i32 r2) -> sse_i32
 {
+    //NOTE: REQUIRES SSE4.1!
     return sse_i32(_mm_mullo_epi32(r1, r2));
 }
 
@@ -155,6 +156,18 @@ auto operator* (sse_float r1, sse_float r2) -> sse_float
 auto operator* (sse_double r1, sse_double r2) -> sse_double 
 {
     return sse_double(_mm_mul_pd(r1, r2));
+}
+
+// DIV
+
+auto operator/ (sse_float r1, sse_float r2) -> sse_float
+{
+    return sse_float(_mm_div_ps(r1, r2));
+}
+
+auto operator/ (sse_double r1, sse_double r2) -> sse_double 
+{
+    return sse_double(_mm_div_pd(r1, r2));
 }
 
 // ======== AVX ========
@@ -280,11 +293,11 @@ auto operator* (avx_i32 r1, avx_i32 r2) -> avx_i32
     return avx_i32(_mm256_mullo_epi32(r1, r2));
 }
 
-__attribute__((target("avx512f, avx512vl, avx512dq")))
-auto operator* (avx_i64 r1, avx_i64 r2) -> avx_i64
-{
-    return avx_i64(_mm256_mullo_epi64(r1, r2));
-}
+// __attribute__((target("avx512f, avx512vl, avx512dq")))
+// auto operator* (avx_i64 r1, avx_i64 r2) -> avx_i64
+// {
+//     return avx_i64(_mm256_mullo_epi64(r1, r2));
+// }
 
 __attribute__((target("avx2")))
 auto operator* (avx_float r1, avx_float r2) -> avx_float
@@ -297,6 +310,25 @@ auto operator* (avx_double r1, avx_double r2) -> avx_double
 {
     return avx_double(_mm256_mul_pd(r1, r2));
 }
+
+// DIV
+__attribute__((target("avx2")))
+auto operator/ (avx_float r1, avx_float r2) -> avx_float
+{
+    return avx_float(_mm256_div_ps(r1, r2));
+}
+
+__attribute__((target("avx2")))
+auto operator/ (avx_double r1, avx_double r2) -> avx_double
+{
+    return avx_double(_mm256_div_pd(r1, r2));
+}
+
+
+#define DECL_SIMD_OP(_op_, T)                       \
+template <char>                                     \
+auto op (T, T) -> T;                                \
+
 
 
 #define DEF_SIMD_OP(_op_, T)                        \
@@ -334,6 +366,13 @@ DEF_SIMD_OP(*, sse_u8)
 DEF_SIMD_OP(*, sse_i16)
 DEF_SIMD_OP(*, sse_i32) // SSE4.1
 
+DEF_SIMD_OP(/, sse_float)
+DEF_SIMD_OP(/, sse_double)
+
+
+//////////////////////////
+// AVX
+
 DEF_SIMD_OP(+, avx_float)
 DEF_SIMD_OP(+, avx_double)
 DEF_SIMD_OP(+, avx_i8)
@@ -356,7 +395,9 @@ DEF_SIMD_OP(*, avx_i8)
 DEF_SIMD_OP(*, avx_u8)
 DEF_SIMD_OP(*, avx_i16)
 DEF_SIMD_OP(*, avx_i32)
-DEF_SIMD_OP(*, avx_i64) // AVX512VL
+
+DEF_SIMD_OP(/, avx_float)
+DEF_SIMD_OP(/, avx_double)
 
 
 #undef func

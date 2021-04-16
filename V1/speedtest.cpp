@@ -63,10 +63,12 @@ int main() {
     //auto N = 42;
     int s = 0;
     std::srand(std::time(nullptr));
+
+    using T = i8;
         
     
-    auto v = Vex<i8>(N, 'a'); // [7] * 14
-    auto w = Vex<i8>(N, 2); // [2] * 14
+    auto v = Vex<T>(N, 'a'); // [7] * 14
+    auto w = Vex<T>(N, 2); // [2] * 14
     //v+=w;
     
     //rand_init(v, N);
@@ -74,44 +76,44 @@ int main() {
     //std::cout << v << w << "\n";
     
 
-    {
-        auto t = timing::msTimer("vex_add: vex + vex");
-        //v += w; // SIMD?
-        //v += 7;
-        Vex<i8> r = vex_add(v, w);
-    }
+    // {
+    //     auto t = timing::msTimer("vex_add: vex + vex");
+    //     //v += w; // SIMD?
+    //     //v += 7;
+    //     Vex<T> r = vex_add(v, w);
+    // }
 
     {
         auto t = timing::msTimer("SIMD proxy vex <+> vex");
         //v += w; // SIMD?
         //v += 7;
-        Vex<i8> r = v * i8(7);
+        Vex<T> r = w + v * T(7);
     }
     
-    auto vv = std::vector<i8> (N, 'a');
-    auto vw = std::vector<i8> (N, 2);
-    std::vector<i8> res;
+    auto vv = std::vector<T> (N, 'a');
+    auto vw = std::vector<T> (N, 2);
+    std::vector<T> res;
     //rand_init(vv, N);
     //rand_init(vw, N);
     {
         auto t = timing::msTimer("vector");
-        res = std::vector<i8>(N);
+        res = std::vector<T>(N);
         for (size_t i=0; i<vv.size(); ++i) {
             //vv[i] += vw[i];
             //vv[i] += 7;
             //res[i] = vv[i] + vw[i];
-            res[i] = vv[i] * i8(7);
+            res[i] = vw[i] + vv[i] * T(7);
         }
         s += vv[0];
     }
     
-    auto va = std::valarray<i8> ('a', N);
-    auto wa = std::valarray<i8> (2, N);
+    auto va = std::valarray<T> ('a', N);
+    auto wa = std::valarray<T> (2, N);
     //rand_init(va, N);
     //rand_init(wa, N);
     {
         auto t = timing::msTimer("valarray");
-        std::valarray<i8> res = va * i8(7);
+        std::valarray<T> res = wa + va * T(7);
         //std::valarray<i8> res = va + wa;
         //va += wa;
         //va += 7;
