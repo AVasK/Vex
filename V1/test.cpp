@@ -57,6 +57,7 @@ int main()
     ASSERT_EQ(Vex<T>(vex1 + vex2), vec3);
     std::vector<T> vec7 (N, 7);
     ASSERT_EQ(Vex<T>(vex1 + vex2 + vex3 + 1), vec7);
+    ASSERT_EQ(Vex<T>(vex3 - vex2), vec1);
     ASSERT_EQ(vex2 += vex1, vec3);
     ASSERT_EQ(vex1, vec1);
     ASSERT_EQ(Vex<T>(vex1 + 2), vec3); // operator+ (Vex<i16>, int)

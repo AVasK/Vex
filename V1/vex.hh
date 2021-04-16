@@ -23,6 +23,10 @@
 #include "intrin_funcs.hh"
 
 
+// ===============================
+// ========== Addition ===========
+// ===============================
+
 template<typename T>
 func Vex<T>::operator+= (Vex<T> const& other) -> Vex<T>&
 {
@@ -35,6 +39,7 @@ func Vex<T>::operator+= (Vex<T> const& other) -> Vex<T>&
     }
     return *this;
 }
+
 
 template<typename T>
 func Vex<T>::operator+= (T other) -> Vex<T>&
@@ -49,6 +54,7 @@ func Vex<T>::operator+= (T other) -> Vex<T>&
     }
     return *this;
 }
+
 
 template <typename T>
 func vex_add (Vex<T> const& v1, Vex<T> const& v2) -> Vex<T>
@@ -84,6 +90,78 @@ func vex_add (T value, Vex<T> const& vex) -> Vex<T>
 {
     return vex_add(vex, value);
 }
+
+
+// ===============================
+// ========= Subtraction =========
+// ===============================
+
+
+template<typename T>
+func Vex<T>::operator-= (Vex<T> const& other) -> Vex<T>&
+{
+    if (simd_flags() & SIMD::AVX2) {
+        sub_avx(*this, *this, other);
+    }
+    // Add compile-time user-set-flags checking
+    else if (simd_flags() & SIMD::SSE2) {
+        sub_sse(*this, *this, other);
+    }
+    return *this;
+}
+
+
+template<typename T>
+func Vex<T>::operator-= (T other) -> Vex<T>&
+{   
+    if (simd_flags() & SIMD::AVX2) {
+        // AVX2
+        subval_avx(*this, *this, other);
+    }
+    else if (simd_flags() & SIMD::SSE2) {
+        // SSE2
+        subval_sse(*this, *this, other);
+    }
+    return *this;
+}
+
+
+template <typename T>
+func vex_sub (Vex<T> const& v1, Vex<T> const& v2) -> Vex<T>
+{
+    Vex<T> res (v1.size());
+
+    if (Vex<T>::simd_flags() & SIMD::AVX2) {
+        sub_avx(res, v1, v2);
+    }
+    else if (Vex<T>::simd_flags() & SIMD::SSE2) {
+        sub_sse(res, v1, v2);
+    }
+    return res;
+}
+
+
+template<typename T>
+inline func vex_sub (Vex<T> const& vex, T value) -> Vex<T>
+{
+    Vex<T> res (vex.size());
+    
+    if (Vex<T>::simd_flags() & SIMD::AVX2) {
+        subval_avx(res, vex, value);
+    }
+    else if (Vex<T>::simd_flags() & SIMD::SSE2) {
+        subval_sse(res, vex, value);
+    }
+    return res;
+}
+
+template<typename T>
+func vex_sub (T value, Vex<T> const& vex) -> Vex<T>
+{
+    return vex_sub(vex, value);
+}
+
+
 
 
 template <typename T>
