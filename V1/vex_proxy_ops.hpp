@@ -98,6 +98,8 @@ struct eval_op<'*'> {
     {
     #ifdef __AVX2__
         mul_avx(res, v1, v2);
+    #elif __SSE4_1__ 
+        mul_sse(res, v1, v2);
     #else
     
         auto flags = Vex<i32>::simd_flags();
