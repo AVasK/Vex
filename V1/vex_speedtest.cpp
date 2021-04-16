@@ -64,15 +64,11 @@ int main() {
         sum += r[0];
     }
 
-
     {
         auto t = timing::msTimer("Vex");
         Vex<i16> res = a + b + c + i16(1);
         //res = a + b;
     }
-
-    
-
     
     {
         auto t = timing::msTimer("valarray");

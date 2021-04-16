@@ -10,18 +10,19 @@
 
 #include "vex_proxy.hpp"
 
-// #ifdef __SSE4_2__ 
-// #error "SSE4.2 flag has leaked into user-space"
-// #endif
+/*
+#ifdef __SSE4_2__ 
+#error "SSE4.2 flag has leaked into user-space"
+#endif
 
-// #ifdef __AVX__ 
-// #error "AVX flag has leaked into user-space"
-// #endif
+#ifdef __AVX__ 
+#error "AVX flag has leaked into user-space"
+#endif
 
-// #ifdef __AVX2__ 
-// #error "AVX2 flag has leaked into user-space"
-// #endif
-
+#ifdef __AVX2__ 
+#error "AVX2 flag has leaked into user-space"
+#endif
+*/
 
 template <typename T>
 void rand_init(T & array_like, size_t N)
@@ -72,13 +73,12 @@ int main() {
     //rand_init(w, N);
     //std::cout << v << w << "\n";
     
+
     {
-        auto t = timing::msTimer("SIMD vex + vex");
+        auto t = timing::msTimer("vex_add: vex + vex");
         //v += w; // SIMD?
         //v += 7;
-        //Vex<i8> r = add(v, w);
-        v += w;
-        //std::cout << r[0] << "\n";
+        Vex<i8> r = vex_add(v, w);
     }
 
     {
@@ -86,17 +86,6 @@ int main() {
         //v += w; // SIMD?
         //v += 7;
         Vex<i8> r = v + w;
-        /*
-        auto val = r[0];
-        for (size_t i = 0; i < N; i++)
-        {
-            if (r[i] != r[0])
-            {
-                std::cerr << "ERR!\n";
-                return 1;
-            }
-        }
-        */
     }
     
     auto vv = std::vector<i8> (N, 'a');
@@ -108,9 +97,9 @@ int main() {
         auto t = timing::msTimer("vector");
         res = std::vector<i8>(N);
         for (size_t i=0; i<vv.size(); ++i) {
-            vv[i] += vw[i];
+            //vv[i] += vw[i];
             //vv[i] += 7;
-            //res[i] = vv[i] + vw[i];
+            res[i] = vv[i] + vw[i];
         }
         s += vv[0];
     }
@@ -121,8 +110,8 @@ int main() {
     rand_init(wa, N);
     {
         auto t = timing::msTimer("valarray");
-        //std::valarray<i8> res = va + wa;
-        va += wa;
+        std::valarray<i8> res = va + wa;
+        //va += wa;
         //va += 7;
     }
     
