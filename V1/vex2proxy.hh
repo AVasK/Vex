@@ -77,23 +77,23 @@ struct VISum {
 };
 
 
-template <typename T>
-auto operator+ (Vex<T> const& v1, Vex<T> const& v2) -> VSum<T>
-{
-    return VSum<T>(v1, v2);
-}
+// template <typename T>
+// auto operator+ (Vex<T> const& v1, Vex<T> const& v2) -> VSum<T>
+// {
+//     return VSum<T>(v1, v2);
+// }
 
-template <typename T>
-auto operator+ (Vex<T> const& v, promote_t<T> val) -> VISum<T>
-{
-    return VISum<T>(v, T(val));
-}
+// template <typename T>
+// auto operator+ (Vex<T> const& v, promote_t<T> val) -> VISum<T>
+// {
+//     return VISum<T>(v, T(val));
+// }
 
-template <typename T>
-auto operator+ (promote_t<T> val, Vex<T> const& v) -> VISum<T>
-{
-    return VISum<T>(v, T(val));
-}
+// template <typename T>
+// auto operator+ (promote_t<T> val, Vex<T> const& v) -> VISum<T>
+// {
+//     return VISum<T>(v, T(val));
+// }
 
 /*
 // VSum / VISum to vex_op in case where there are more additions/subtractions e.t.c
@@ -170,10 +170,15 @@ using t4 = wrap_vex<vex_op<Vex<i8>,'+',Val<i8>>>::type;
 //                 = Val<T> if V is arithmetic
 //                 = V otherwise
 
-template <typename V1, typename V2, 
-          typename = decltype(std::declval<V1>().get_avx_reg(0))
-         >
-auto operator+ (V1 const& v1, V2 const& v2) -> vex_op<wrap_t<V1>,'+',wrap_t<V2>>
+template <
+    typename V1,
+    typename V2, 
+    typename = decltype(std::declval<wrap_t<V1>>().get_avx_reg(0))
+>  
+constexpr auto operator+ (V1 const& v1, V2 const& v2) -> vex_op<wrap_t<V1>,'+',wrap_t<V2>>
 {
     return vex_op<wrap_t<V1>,'+',wrap_t<V2>>( v1, v2 );
 }
+
+template <typename T1, typename T2>
+using lesser_type = typename std::conditional<(sizeof(T1) < sizeof(T2)), T1, T2>::type;

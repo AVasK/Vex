@@ -32,7 +32,6 @@ int main() {
     const auto a = Vex<i16>(N, 7);
     auto b = Vex<i16>(N, 3);
     auto c = Vex<i16>(N, 11);
-    auto res = Vex<i16>(N);
 
     std::vector<i16> v1 (N, 7);
     std::vector<i16> v2 (N, 3);
@@ -42,35 +41,33 @@ int main() {
     std::valarray<i16> vl1 (7, N);
     std::valarray<i16> vl2 (3, N);
     std::valarray<i16> vl3 (11, N);
-    std::valarray<i16> rl (N);
+    
+
+    size_t sum = 0;
 
     {
         auto t = timing::msTimer("for-loop");
+        auto res = Vex<i16>(N);
         for (int i=0; i<a.size(); ++i)
         {
             res[i] = a[i]+b[i]+c[i]+1;
-            //res[i] = a[i] + b[i];
         }
     }
 
     {
         auto t = timing::msTimer("vector for");
+        std::vector<i16> r  (N, 0);
         for (size_t i=0; i<v1.size(); ++i)
         {
             r[i] = v1[i] + v2[i] + v3[i] + 1;
         }
-    }
-    int sum = r[100];
-
-    {
-        auto t = timing::msTimer("a + b");
-        res = a + b + c + i16(1);
-        //res = a + b;
+        sum += r[0];
     }
 
+
     {
-        auto t = timing::msTimer("a + b");
-        res = a + b + c + i16(1);
+        auto t = timing::msTimer("Vex");
+        Vex<i16> res = a + b + c + i16(1);
         //res = a + b;
     }
 
@@ -79,7 +76,7 @@ int main() {
     
     {
         auto t = timing::msTimer("valarray");
-        rl = vl1 + vl2 + vl3 + 1;
+        std::valarray<i16> rl = vl1 + vl2 + vl3 + 1;
         //res = a + b;
     }
 

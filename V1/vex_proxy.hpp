@@ -52,7 +52,7 @@ struct vex_op
 
     using value_type = typename T1::value_type;
 
-    vex_op (T1 t1, T2 t2)
+    constexpr vex_op (T1 t1, T2 t2)
     : v1 {t1}
     , v2 {t2}
     {}
@@ -62,10 +62,9 @@ struct vex_op
         return eval();
     }
 
-    func size() const -> size_t
+    constexpr func size() const -> size_t
     {
-        auto res = std::min(v1.size(), v2.size());
-        return res;
+        return std::min(v1.size(), v2.size());
     }
 
     func size_in_registers() const -> size_t
@@ -110,15 +109,15 @@ struct vex_op
 
 
 template <typename T>
-class Val {
-public:
+struct Val {
+
     using value_type = T;
 
-    Val(T _val)
+    constexpr Val(T _val)
     : val {_val}
     {}
 
-    func operator[] (size_t) const -> value_type
+    constexpr func operator[] (size_t) const -> value_type
     {
         return val;
     }
@@ -135,28 +134,24 @@ public:
         return std::numeric_limits<std::size_t>::max();
     }
 
-    func get_sse_reg (size_t idx) const -> sse_reg<value_type>
+    constexpr func get_sse_reg (size_t idx) const -> sse_reg<value_type>
     {
-    static auto res = sse_reg<value_type>(val);
-    return res;
+        return sse_reg<value_type>(val);
     }
     
     __attribute__((target("avx2")))
-    func get_avx_reg (size_t idx) const -> avx_reg<value_type>
+    constexpr func get_avx_reg (size_t idx) const -> avx_reg<value_type>
     {
-        static auto res = avx_reg<value_type>( val );
-        return res;
+        return avx_reg<value_type>( val );
     }
 
-private:
     T val;
 };
 
 
 //  VProxy is a thin wrapper around Vex<T> to avoid copying when passing in expression templates
 template <typename T>
-class VProxy {
-public:
+struct VProxy {
 
     using value_type = T;
 
@@ -191,7 +186,6 @@ public:
        return load_avx(&vector[i]);
     }
 
-private:
     Vex<T> const& vector;
 };
 

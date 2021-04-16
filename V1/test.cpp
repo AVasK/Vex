@@ -45,18 +45,20 @@ int main()
     int N = 30;
     using T = i32;
     const auto vec3 = std::vector<T>(N, 3);
+    const auto vec1 = std::vector<T>(N, 1);
     auto vex3 = Vex<T>(N, 3);
     auto fvex = Vex<float>(N, 3.0);
     fvex += Vex<float>(N, 0.1415);
     ASSERT_EQ(vex3, vec3);
-    std::cout << "vex3 = " << vex3 << "\n";
     auto vex1 = Vex<T>(N, 1);
     auto vex2 = Vex<T>(N, 2);
+    ASSERT_EQ(Vex<T>(1 + vex2), vec3);
+    ASSERT_EQ(Vex<T>(vex2 + 1), vec3);
     ASSERT_EQ(Vex<T>(vex1 + vex2), vec3);
     std::vector<T> vec7 (N, 7);
     ASSERT_EQ(Vex<T>(vex1 + vex2 + vex3 + 1), vec7);
-    std::cout << "vex1 + vex2 = " << Vex<T>(vex1 + vex2) << "\n";
     ASSERT_EQ(vex2 += vex1, vec3);
+    ASSERT_EQ(vex1, vec1);
     ASSERT_EQ(Vex<T>(vex1 + 2), vec3); // operator+ (Vex<i16>, int)
     ASSERT_EQ(vex1 += 2, vec3);
     
