@@ -16,7 +16,7 @@ bool equal(Vex<T> const& vx, std::vector<T> const& v)
     if (vx.size() != v.size()) { std::cerr<<"size mismatch\n"; return false; }
     for (int i=0; i< v.size(); ++i)
     {
-        if ( vx[i] != v[i] ) {
+        if ( vx[i] - v[i] >= 0.00001 ) {
             std::cerr << vx[i] << " != " << v[i] << "\n";
             return false;
         }
@@ -64,4 +64,9 @@ int main()
     ASSERT_EQ(Vex<T>(vex1 + T(2)), vec3); // operator+ (Vex<i16>, int)
     ASSERT_EQ(vex1 += 2, vec3);
     
+    std::vector<float> vf1 (N, 3.14);
+    Vex<float> x1 (N, 2.0);
+    Vex<float> x2 (N, 0.14);
+    ASSERT_EQ(Vex<float>(x1 + x1/2.f + x2), vf1);
+
 }

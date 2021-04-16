@@ -203,5 +203,16 @@ constexpr auto operator* (V1 const& v1, V2 const& v2) -> vex_op<wrap_t<V1>,'*',w
 }
 
 
+template <
+    typename V1,
+    typename V2, 
+    typename = decltype(std::declval<wrap_t<V1>>().get_avx_reg(0))
+>  
+constexpr auto operator/ (V1 const& v1, V2 const& v2) -> vex_op<wrap_t<V1>,'/',wrap_t<V2>>
+{
+    return vex_op<wrap_t<V1>,'/',wrap_t<V2>>( v1, v2 );
+}
+
+
 template <typename T1, typename T2>
 using lesser_type = typename std::conditional<(sizeof(T1) < sizeof(T2)), T1, T2>::type;
