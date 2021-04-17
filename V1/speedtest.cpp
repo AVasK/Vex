@@ -64,7 +64,7 @@ int main() {
     int s = 0;
     std::srand(std::time(nullptr));
 
-    using T = float;
+    using T = i8;
         
     
     auto v = Vex<T>(N, 'a'); // [7] * 14

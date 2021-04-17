@@ -325,13 +325,8 @@ auto operator/ (avx_double r1, avx_double r2) -> avx_double
 }
 
 
-#define DECL_SIMD_OP(_op_, T)                       \
-template <char>                                     \
-auto op (T, T) -> T;                                \
 
-
-
-#define DEF_SIMD_OP(_op_, T)                        \
+#define DEF_OP(_op_, T)                        \
                                                     \
 template <char>                                     \
 auto op (T, T) -> T;                                \
@@ -343,61 +338,95 @@ auto op< #_op_[0] > (T r1, T r2) -> T               \
 }
 
 
-DEF_SIMD_OP(+, sse_float)
-DEF_SIMD_OP(+, sse_double)
-DEF_SIMD_OP(+, sse_i8)
-DEF_SIMD_OP(+, sse_u8)
-DEF_SIMD_OP(+, sse_i16)
-DEF_SIMD_OP(+, sse_i32)
-DEF_SIMD_OP(+, sse_i64)
+// plain NON-SIMD case:
+DEF_OP(+, i8)
+DEF_OP(+, u8)
+DEF_OP(+, i16)
+DEF_OP(+, i32)
+DEF_OP(+, i64)
+DEF_OP(+, float)
+DEF_OP(+, double)
 
-DEF_SIMD_OP(-, sse_float)
-DEF_SIMD_OP(-, sse_double)
-DEF_SIMD_OP(-, sse_i8)
-DEF_SIMD_OP(-, sse_u8)
-DEF_SIMD_OP(-, sse_i16)
-DEF_SIMD_OP(-, sse_i32)
-DEF_SIMD_OP(-, sse_i64)
+DEF_OP(-, i8)
+DEF_OP(-, u8)
+DEF_OP(-, i16)
+DEF_OP(-, i32)
+DEF_OP(-, i64)
+DEF_OP(-, float)
+DEF_OP(-, double)
 
-DEF_SIMD_OP(*, sse_float)
-DEF_SIMD_OP(*, sse_double)
-DEF_SIMD_OP(*, sse_i8)
-DEF_SIMD_OP(*, sse_u8)
-DEF_SIMD_OP(*, sse_i16)
-DEF_SIMD_OP(*, sse_i32) // SSE4.1
+DEF_OP(*, i8)
+DEF_OP(*, u8)
+DEF_OP(*, i16)
+DEF_OP(*, i32)
+DEF_OP(*, i64)
+DEF_OP(*, float)
+DEF_OP(*, double)
 
-DEF_SIMD_OP(/, sse_float)
-DEF_SIMD_OP(/, sse_double)
+DEF_OP(/, i8)
+DEF_OP(/, u8)
+DEF_OP(/, i16)
+DEF_OP(/, i32)
+DEF_OP(/, i64)
+DEF_OP(/, float)
+DEF_OP(/, double)
+
+
+DEF_OP(+, sse_float)
+DEF_OP(+, sse_double)
+DEF_OP(+, sse_i8)
+DEF_OP(+, sse_u8)
+DEF_OP(+, sse_i16)
+DEF_OP(+, sse_i32)
+DEF_OP(+, sse_i64)
+
+DEF_OP(-, sse_float)
+DEF_OP(-, sse_double)
+DEF_OP(-, sse_i8)
+DEF_OP(-, sse_u8)
+DEF_OP(-, sse_i16)
+DEF_OP(-, sse_i32)
+DEF_OP(-, sse_i64)
+
+DEF_OP(*, sse_float)
+DEF_OP(*, sse_double)
+DEF_OP(*, sse_i8)
+DEF_OP(*, sse_u8)
+DEF_OP(*, sse_i16)
+DEF_OP(*, sse_i32) // SSE4.1
+
+DEF_OP(/, sse_float)
+DEF_OP(/, sse_double)
 
 
 //////////////////////////
 // AVX
 
-DEF_SIMD_OP(+, avx_float)
-DEF_SIMD_OP(+, avx_double)
-DEF_SIMD_OP(+, avx_i8)
-DEF_SIMD_OP(+, avx_u8)
-DEF_SIMD_OP(+, avx_i16)
-DEF_SIMD_OP(+, avx_i32)
-DEF_SIMD_OP(+, avx_i64)
+DEF_OP(+, avx_float)
+DEF_OP(+, avx_double)
+DEF_OP(+, avx_i8)
+DEF_OP(+, avx_u8)
+DEF_OP(+, avx_i16)
+DEF_OP(+, avx_i32)
+DEF_OP(+, avx_i64)
 
-DEF_SIMD_OP(-, avx_float)
-DEF_SIMD_OP(-, avx_double)
-DEF_SIMD_OP(-, avx_i8)
-DEF_SIMD_OP(-, avx_u8)
-DEF_SIMD_OP(-, avx_i16)
-DEF_SIMD_OP(-, avx_i32)
-DEF_SIMD_OP(-, avx_i64)
+DEF_OP(-, avx_float)
+DEF_OP(-, avx_double)
+DEF_OP(-, avx_i8)
+DEF_OP(-, avx_u8)
+DEF_OP(-, avx_i16)
+DEF_OP(-, avx_i32)
+DEF_OP(-, avx_i64)
 
-DEF_SIMD_OP(*, avx_float)
-DEF_SIMD_OP(*, avx_double)
-DEF_SIMD_OP(*, avx_i8)
-DEF_SIMD_OP(*, avx_u8)
-DEF_SIMD_OP(*, avx_i16)
-DEF_SIMD_OP(*, avx_i32)
+DEF_OP(*, avx_float)
+DEF_OP(*, avx_double)
+DEF_OP(*, avx_i8)
+DEF_OP(*, avx_u8)
+DEF_OP(*, avx_i16)
+DEF_OP(*, avx_i32)
 
-DEF_SIMD_OP(/, avx_float)
-DEF_SIMD_OP(/, avx_double)
+DEF_OP(/, avx_float)
+DEF_OP(/, avx_double)
 
 
 #undef func

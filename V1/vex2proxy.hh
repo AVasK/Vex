@@ -1,6 +1,8 @@
 // <-> Included into vex.hpp
 #pragma once
 
+#include "type_traits"
+#include "type_ops.hpp"
 #include "vex_proxy.hpp"
 #include "simd_types.hpp"
 
@@ -76,7 +78,6 @@ struct VISum {
 
 };
 
-
 // template <typename T>
 // auto operator+ (Vex<T> const& v1, Vex<T> const& v2) -> VSum<T>
 // {
@@ -133,32 +134,7 @@ auto operator+ (Vexlike const& vexlike, Vex<_vtype> const& vex) -> vex_op<Vexlik
 }
 */
 
-template <typename T>
-struct wrap_vex {
-    using type = T;
-};
 
-template <typename T>
-struct wrap_vex<Vex<T>> {
-    using type = VProxy<T>;
-};
-
-#define DEF_WRAP_VEX(T)     \
-template <>                 \
-struct wrap_vex<T> {        \
-    using type = Val<T>;    \
-};                          \
-
-DEF_WRAP_VEX(i8)
-DEF_WRAP_VEX(u8)
-DEF_WRAP_VEX(i16)
-DEF_WRAP_VEX(i32)
-DEF_WRAP_VEX(i64)
-DEF_WRAP_VEX(float)
-DEF_WRAP_VEX(double)
-
-template <typename T>
-using wrap_t = typename wrap_vex<T>::type;
 
 // operator+ (wrap_t<V1>, wrap_t<V2>) -> vex_op<Wrap<V1>,'+',Wrap<V2>
 // where wrap_t<V> = VProxy<T> if V == Vex<T>
@@ -214,5 +190,3 @@ constexpr auto operator/ (V1 const& v1, V2 const& v2) -> vex_op<wrap_t<V1>,'/',w
 }
 
 
-template <typename T1, typename T2>
-using lesser_type = typename std::conditional<(sizeof(T1) < sizeof(T2)), T1, T2>::type;

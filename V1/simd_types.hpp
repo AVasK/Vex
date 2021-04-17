@@ -24,12 +24,7 @@
 #include <type_traits>
 #include "integers.hpp"
 #include "intrinsics.hpp"
-
-
-template <typename T>
-using promote_t = typename std::remove_reference<decltype( 
-        std::declval<T>() + 0
-    )>::type;
+#include "type_ops.hpp"
 
 
 template <typename T>

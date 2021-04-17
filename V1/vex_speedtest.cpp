@@ -48,7 +48,7 @@ int main() {
     {
         auto t = timing::msTimer("for-loop");
         auto res = Vex<i16>(N);
-        for (int i=0; i<a.size(); ++i)
+        for (size_t i=0; i<a.size(); ++i)
         {
             res[i] = a[i]+b[i]+c[i]+1;
         }

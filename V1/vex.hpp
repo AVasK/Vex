@@ -28,6 +28,7 @@
 #include "simd_ops.hpp"
 #include "vex_ops.hpp"
 #include "x86_cpuid.hpp"
+#include "vmask.hpp"
 
 #define func auto
 
@@ -85,6 +86,16 @@ public:
     explicit Vex(size_t size, T fill_value)
     : memory(size, fill_value, _alignment())
     {}
+
+    Vex(std::initializer_list<T> ilist)
+    : memory(ilist.size(), _alignment())
+    {
+        size_t i = 0;
+        for (auto elem : ilist)
+        {
+            memory[i++] = elem;
+        }
+    }
     
     static func simd_flags() -> u8
     {
@@ -147,6 +158,12 @@ public:
     func operator[] (size_t idx) const -> const T&
     {
         return memory[idx];
+    }
+
+    template <typename Comp, typename T1, typename T2>
+    func operator[] (VMask<Comp, T1, T2> const& mask) -> VMaskedProxy<Vex<T>, Comp, T1, T2>
+    {
+        return VMaskedProxy<Vex<T>, Comp, T1, T2>( *this, mask );
     }
     
     // Size & Memory Management
