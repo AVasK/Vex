@@ -161,11 +161,18 @@ auto i32_mul_sse (sse_i32 r1, sse_i32 r2) -> sse_i32
     return sse_i32(0);
 }
 
+#ifdef __SSE_4_1__
+__attribute__((target("sse4.1")))
+#endif
 auto operator* (sse_i32 r1, sse_i32 r2) -> sse_i32
 {
+#ifdef __SSE4_1__
+    return i32_mul_sse4_1(r1, r2);
+#else
     using F_i32_SSE = sse_i32 (*)(sse_i32, sse_i32);
     static F_i32_SSE i32_mul = (simd_flags() & SIMD::SSE4_1) ? i32_mul_sse4_1 : i32_mul_sse;
     return i32_mul(r1, r2);
+#endif
 }
 
 // auto operator* (sse_i64 r1, sse_i64 r2) -> sse_i64

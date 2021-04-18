@@ -64,7 +64,7 @@ int main() {
     int s = 0;
     std::srand(std::time(nullptr));
 
-    using T = i8;
+    using T = i32;
         
     
     auto v = Vex<T>(N, 'a'); // [7] * 14
@@ -82,6 +82,20 @@ int main() {
     //     //v += 7;
     //     Vex<T> r = vex_add(v, w);
     // }
+
+    {
+        auto t = timing::msTimer("SIMD proxy vex <+> vex");
+        //v += w; // SIMD?
+        //v += 7;
+        Vex<T> r = w + v * T(7);
+    }
+
+    {
+        auto t = timing::msTimer("SIMD proxy vex <+> vex");
+        //v += w; // SIMD?
+        //v += 7;
+        Vex<T> r = w + v * T(7);
+    }
 
     {
         auto t = timing::msTimer("SIMD proxy vex <+> vex");

@@ -91,6 +91,7 @@ struct eval_op<'*'> {
     #endif
     }
 
+    /*
     // SPECIAL CASES:
     // i32:
     template<typename V1, typename V2>
@@ -120,6 +121,7 @@ struct eval_op<'*'> {
         }
     #endif
     }
+*/
 };
 
 

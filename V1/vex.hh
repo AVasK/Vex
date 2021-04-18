@@ -234,49 +234,6 @@ func vex_mul (T value, Vex<T> const& vex) -> Vex<T>
 }
 
 
-/*
-// Overload operator* for i32 case: (NO PROXY)
-auto operator* (Vex<i32> const& vex, i32 val) -> Vex<i32>
-{
-    std::cerr << "NO PROXY\n";
-    auto len = vex.size();
-    Vex<i32> res ( len );
-    for (size_t i=0; i<len; ++i)
-    {
-        res[i] = vex[i] * val;
-    }
-    return res;
-}
-
-template<>
-func Vex<i32>::operator*= (i32 other) -> Vex<i32>&
-{   
-    *this = *this * other;
-    return *this;
-}
-*/
-
-// Overload operator* for i64 case: (NO PROXY)
-auto operator* (Vex<i64> const& vex, i64 val) -> Vex<i64>
-{
-    std::cerr << "NO PROXY\n";
-    auto len = vex.size();
-    Vex<i64> res ( len );
-    for (size_t i=0; i<len; ++i)
-    {
-        res[i] = vex[i] * val;
-    }
-    return res;
-}
-
-template<>
-func Vex<i64>::operator*= (i64 other) -> Vex<i64>&
-{   
-    *this = *this * other;
-    return *this;
-}
-
-
 template <typename T>
 std::ostream& operator<< (std::ostream& os, Vex<T> const& arr)
 {
