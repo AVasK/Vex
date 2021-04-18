@@ -135,7 +135,26 @@ int main() {
     
     //std::cout << s << "\n";
     
-    
+    {
+        auto t = timing::msTimer("SIMD vex[mask]");
+        w[v == T('a')] = 7;
+    }
+
+    {
+        auto t = timing::msTimer("valarray[mask]");
+        wa[va == T('a')] = 7;
+    }
+
+    {
+        auto t = timing::msTimer("std::vector[mask]");
+        for (size_t i=0; i<vv.size(); i++)
+        {
+            if (vv[i] == T('a'))
+            {
+                vw[i] = 7;
+            }
+        }
+    }
      
     //std::cout << v << "\n" << w << "\n" << z << "\n";
     
@@ -161,4 +180,5 @@ int main() {
      }
      
      */
+
 }
