@@ -22,9 +22,18 @@
 #pragma once 
 
 #include "simd_types.hpp"
-#include "intrinsics.hpp"
+#include "intrinsics.hpp" // cross-compiler/platform intrinsics header
+#include "x86_cpuid.hpp" // simd flags for the dynamic dispatch
 
 #define func auto
+
+
+static func simd_flags() -> decltype(SIMD::AVX)
+{
+    const static CPUID::CPU cpu;
+    const static auto flags = cpu.supported_simd();
+    return flags;
+}
 
 
 __attribute__((target("avx2")))
@@ -136,11 +145,27 @@ auto operator* (sse_i16 r1, sse_i16 r2) -> sse_i16
     return sse_i16(_mm_mullo_epi16(r1, r2));
 }
 
+// i32 mul dynamic dispatch (ptr-based)
 __attribute__((target("sse4.1")))
+auto i32_mul_sse4_1 (sse_i32 r1, sse_i32 r2) -> sse_i32
+{
+    return sse_i32(_mm_mullo_epi32(r1, r2));
+}
+
+// NOTE: Not implemented yet
+// TODO: implement with vector_shift'ed i16 muls
+auto i32_mul_sse (sse_i32 r1, sse_i32 r2) -> sse_i32
+{
+    std::cerr << "NOT IMPLEMENTED!\n";
+    exit(1);
+    return sse_i32(0);
+}
+
 auto operator* (sse_i32 r1, sse_i32 r2) -> sse_i32
 {
-    //NOTE: REQUIRES SSE4.1!
-    return sse_i32(_mm_mullo_epi32(r1, r2));
+    using F_i32_SSE = sse_i32 (*)(sse_i32, sse_i32);
+    static F_i32_SSE i32_mul = (simd_flags() & SIMD::SSE4_1) ? i32_mul_sse4_1 : i32_mul_sse;
+    return i32_mul(r1, r2);
 }
 
 // auto operator* (sse_i64 r1, sse_i64 r2) -> sse_i64
