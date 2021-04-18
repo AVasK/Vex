@@ -160,10 +160,10 @@ public:
         return memory[idx];
     }
 
-    template <typename Comp, typename T1, typename T2>
-    func operator[] (VMask<Comp, T1, T2> const& mask) -> VMaskedProxy<Vex<T>, Comp, T1, T2>
+    template <Comparator C, typename T1, typename T2>
+    func operator[] (VMask<C, T1, T2> const& mask) -> VMaskedProxy<Vex<T>, C, T1, T2>
     {
-        return VMaskedProxy<Vex<T>, Comp, T1, T2>( *this, mask );
+        return VMaskedProxy<Vex<T>, C, T1, T2>( *this, mask );
     }
     
     // Size & Memory Management

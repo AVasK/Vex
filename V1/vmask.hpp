@@ -6,7 +6,29 @@
 template <typename T>
 class Vex;
 
-template <typename Comp, typename V1, typename V2>
+enum class Comparator {
+    EQ,     // ==
+    NEQ,    // !=
+    LT,     // <
+    GT,     // >
+    LT_EQ,  // <=
+    GT_EQ   // >=
+};
+
+template <Comparator>
+struct Comparison;
+
+template<>
+struct Comparison<Comparator::EQ>
+{
+    template <typename T>
+    static constexpr bool evaluate (T lhs, T rhs)
+    {
+        return lhs == rhs;
+    }
+};
+
+template <Comparator Comp, typename V1, typename V2>
 class VMask {
 public:
     VMask(V1 _lhs, V2 _rhs)
@@ -16,7 +38,7 @@ public:
 
     bool operator[] (size_t i) const
     {
-        return lhs[i] == rhs[i];
+        return Comparison<Comp>::evaluate(lhs[i], rhs[i]);
     }
 
 private:
@@ -24,7 +46,7 @@ private:
     V2 rhs;
 };
 
-template <typename Vexlike, typename Comp, typename T1, typename T2>
+template <typename Vexlike, Comparator Comp, typename T1, typename T2>
 class VMaskedProxy {   
 public:
     using value_type = typename Vexlike::value_type;
@@ -60,9 +82,9 @@ template <
     //typename = typename std::enable_if< std::is_convertible<V1, Vex<_vtype>>::value >::type
     typename = decltype(std::declval<wrap_t<V1>>().get_avx_reg(0))
 >
-auto operator== (V1 const& vex, V2 const& v2) -> VMask<bool, wrap_t<V1>, wrap_t<V2>>
+auto operator== (V1 const& vex, V2 const& v2) -> VMask<Comparator::EQ, wrap_t<V1>, wrap_t<V2>>
 {
-    return VMask<bool, wrap_t<V1>, wrap_t<V2>>(vex, v2);
+    return VMask<Comparator::EQ, wrap_t<V1>, wrap_t<V2>>(vex, v2);
 }
 
 // template <typename T>
