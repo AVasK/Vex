@@ -38,7 +38,7 @@ bool equal(Vex<T> const& vx, std::vector<T> const& v)
 
 int main()
 {
-    /*
+    
     avx_i8 v8 {4};
     sse_u8 w8 {0};
     avx_i16 v16 {0};
@@ -69,13 +69,16 @@ int main()
     Vex<float> x1 (N, 2.0);
     Vex<float> x2 (N, 0.14);
     ASSERT_EQ(Vex<float>(x1 + x1/2.f + x2), vf1);
-    */
+    
 
     Vex<i16> v = {-1, 1, -1, 1};
     Vex<i16> w = {1, 0, 1, 0};
+    Vex<i16> z = {5,5,5,5};
     (w + v)[0];
-    v[w + v == 0] = 7;
-    v[v == 0] = 1;
+    v[w + v == i16(0)] = 7;
+    //v[v == i16(0)] = 1;
+    v[v == i16(1)] = v + z;
+    // v[1 == 1] = 2; //ERROR
     std::cout << v << "\n";
 
 }

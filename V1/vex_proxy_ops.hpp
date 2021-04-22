@@ -25,6 +25,9 @@
 #include "vex_ops.hpp"
 #include "simd_types.hpp"
 #include "simd_ops.hpp"
+#include "x86_cpuid.hpp"
+
+using CPUID::simd_flags;
 
 template <char opcode>
 struct eval_op {};
@@ -38,7 +41,7 @@ struct eval_op<'+'> {
         mul_avx(res, v1, v2);
     #else
 
-        auto flags = Vex<T>::simd_flags();
+        auto flags = simd_flags();
         if ( flags & SIMD::AVX2 )
         { 
             add_avx(res, v1, v2);
@@ -59,7 +62,7 @@ struct eval_op<'-'> {
         mul_avx(res, v1, v2);
     #else
 
-        auto flags = Vex<T>::simd_flags();
+        auto flags = simd_flags();
         if ( flags & SIMD::AVX2 )
         { 
             sub_avx(res, v1, v2);
@@ -80,7 +83,7 @@ struct eval_op<'*'> {
         mul_avx(res, v1, v2);
     #else
 
-        auto flags = Vex<T>::simd_flags();
+        auto flags = simd_flags();
         if ( flags & SIMD::AVX2 )
         { 
             mul_avx(res, v1, v2);
@@ -130,7 +133,7 @@ struct eval_op<'/'> {
     template <typename T, typename V1, typename V2>
     static inline void compute(Vex<T> & res, V1 const& v1, V2 const& v2)
     {
-        auto flags = Vex<T>::simd_flags();
+        auto flags = simd_flags();
         if ( flags & SIMD::AVX2 )
         { 
             div_avx(res, v1, v2);

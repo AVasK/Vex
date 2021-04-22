@@ -41,6 +41,7 @@ public:
         return Comparison<Comp>::evaluate(lhs[i], rhs[i]);
     }
 
+
 private:
     V1 lhs;
     V2 rhs;
@@ -56,19 +57,48 @@ public:
     , mask {_mask}
     {}
 
-    void operator= (value_type val)
+    template <typename U>
+    void operator= (U const& _val)
     {
+        wrap_t<U> val = _val;
         // naive implementation (no simd):
         for (size_t i = 0; i < vex.size(); i++)
         {
             if (mask[i]) {
-                vex[i] = val;
+                vex[i] = val[i];
             }
         }
     }
 
-    //template <typename V>
-    //auto operator= (V const& other)
+    void operator+= (value_type val)
+    {
+        for (size_t i = 0; i < vex.size(); i++)
+        {
+            if (mask[i]) {
+                vex[i] += val;
+            }
+        }
+    }
+
+    void operator*= (value_type val)
+    {
+        for (size_t i = 0; i < vex.size(); i++)
+        {
+            if (mask[i]) {
+                vex[i] += val;
+            }
+        }
+    }
+
+    void operator/= (value_type val)
+    {
+        for (size_t i = 0; i < vex.size(); i++)
+        {
+            if (mask[i]) {
+                vex[i] += val;
+            }
+        }
+    }
 
 private:
     Vexlike & vex;
@@ -82,7 +112,7 @@ template <
     //typename = typename std::enable_if< std::is_convertible<V1, Vex<_vtype>>::value >::type
     typename = decltype(std::declval<wrap_t<V1>>().get_avx_reg(0))
 >
-auto operator== (V1 const& vex, V2 const& v2) -> VMask<Comparator::EQ, wrap_t<V1>, wrap_t<V2>>
+inline auto operator== (V1 const& vex, V2 const& v2) -> VMask<Comparator::EQ, wrap_t<V1>, wrap_t<V2>>
 {
     return VMask<Comparator::EQ, wrap_t<V1>, wrap_t<V2>>(vex, v2);
 }

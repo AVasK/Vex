@@ -262,7 +262,7 @@ public:
 
 
 // Other funcs:
-auto getCPUVendorString() -> std::string
+inline auto getCPUVendorString() -> std::string
 {
     using namespace std;
     auto regs = cpuid(0);
@@ -274,7 +274,7 @@ auto getCPUVendorString() -> std::string
     return tmp.str();
 }
 
-auto getProcLeaves() -> std::pair<unsigned, unsigned>
+inline auto getProcLeaves() -> std::pair<unsigned, unsigned>
 {
     auto leaf = cpuid(0);
     auto xtended = cpuid(0x80000000);
@@ -290,7 +290,7 @@ inline bool hasAVX(UInt32 ECX)
     return ECX & CPUID::avx;
 }
 
-auto printCPUFeatures() -> std::string {
+inline auto printCPUFeatures() -> std::string {
     auto rpack = cpuid(1);
     auto ECX = rpack.ECX;
     auto EDX = rpack.EDX;
@@ -312,7 +312,7 @@ auto printCPUFeatures() -> std::string {
     return features.str();
 }
 
-auto L2CacheData() -> std::string
+inline auto L2CacheData() -> std::string
 {
     auto data = cpuid(0x80000006);
     std::ostringstream s;
@@ -324,5 +324,13 @@ auto L2CacheData() -> std::string
     return s.str();
 }
 
+// NOTE: Read simd flags
+static auto simd_flags() -> decltype(SIMD::AVX)
+{
+    const static CPUID::CPU cpu;
+    const static auto flags = cpu.supported_simd();
+    return flags;
+    //return VEXMODE::SSE4_2;
+}
 
 }; // namespace CPUID;

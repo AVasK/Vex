@@ -10,19 +10,23 @@
 
 #include "vex_proxy.hpp"
 
-/*
+
+#ifdef __SSE4_1__ 
+#warning "SSE4.1 ENABLED"
+#endif
+
 #ifdef __SSE4_2__ 
-#error "SSE4.2 flag has leaked into user-space"
+#warning "SSE4.2 ENABLED"
 #endif
 
 #ifdef __AVX__ 
-#error "AVX flag has leaked into user-space"
+#warning "AVX ENABLED"
 #endif
 
 #ifdef __AVX2__ 
-#error "AVX2 flag has leaked into user-space"
+#warning "AVX2 ENABLED"
 #endif
-*/
+
 
 template <typename T>
 void rand_init(T & array_like, size_t N)
@@ -137,12 +141,12 @@ int main() {
     
     {
         auto t = timing::msTimer("SIMD vex[mask]");
-        w[v == T('a')] = 7;
+        w[v == T('a')] = v + w;
     }
 
     {
         auto t = timing::msTimer("valarray[mask]");
-        wa[va == T('a')] = 7;
+        wa[va == T('a')] = va + wa;
     }
 
     {
@@ -151,14 +155,12 @@ int main() {
         {
             if (vv[i] == T('a'))
             {
-                vw[i] = 7;
+                vw[i] = vv[i] + vw[i];
             }
         }
     }
      
     //std::cout << v << "\n" << w << "\n" << z << "\n";
-    
-    
     
     /*
      Interface Prototyping:

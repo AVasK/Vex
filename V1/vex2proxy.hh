@@ -140,10 +140,10 @@ auto operator+ (Vexlike const& vexlike, Vex<_vtype> const& vex) -> vex_op<Vexlik
 // where wrap_t<V> = VProxy<T> if V == Vex<T>
 //                 = Val<T> if V is arithmetic
 //                 = V otherwise
-using t1 = wrap_vex<i8>::type;
-using t2 = wrap_vex<Vex<i8>>::type;
-using t3 = wrap_vex<VSum<i8>>::type;
-using t4 = wrap_vex<vex_op<Vex<i8>,'+',Val<i8>>>::type;
+// using t1 = wrap_vex<i8>::type;
+// using t2 = wrap_vex<Vex<i8>>::type;
+// using t3 = wrap_vex<VSum<i8>>::type;
+// using t4 = wrap_vex<vex_op<Vex<i8>,'+',Val<i8>>>::type;
 
 
 template <
@@ -151,7 +151,7 @@ template <
     typename V2, 
     typename = decltype(std::declval<wrap_t<V1>>().get_avx_reg(0))
 >  
-constexpr auto operator+ (V1 const& v1, V2 const& v2) -> vex_op<wrap_t<V1>,'+',wrap_t<V2>>
+constexpr inline auto operator+ (V1 const& v1, V2 const& v2) -> vex_op<wrap_t<V1>,'+',wrap_t<V2>>
 {
     return vex_op<wrap_t<V1>,'+',wrap_t<V2>>( v1, v2 );
 }
@@ -162,7 +162,7 @@ template <
     typename V2, 
     typename = decltype(std::declval<wrap_t<V1>>().get_avx_reg(0))
 >  
-constexpr auto operator- (V1 const& v1, V2 const& v2) -> vex_op<wrap_t<V1>,'-',wrap_t<V2>>
+constexpr inline auto operator- (V1 const& v1, V2 const& v2) -> vex_op<wrap_t<V1>,'-',wrap_t<V2>>
 {
     return vex_op<wrap_t<V1>,'-',wrap_t<V2>>( v1, v2 );
 }
@@ -173,7 +173,7 @@ template <
     typename V2, 
     typename = decltype(std::declval<wrap_t<V1>>().get_avx_reg(0))
 >  
-constexpr auto operator* (V1 const& v1, V2 const& v2) -> vex_op<wrap_t<V1>,'*',wrap_t<V2>>
+constexpr inline auto operator* (V1 const& v1, V2 const& v2) -> vex_op<wrap_t<V1>,'*',wrap_t<V2>>
 {
     return vex_op<wrap_t<V1>,'*',wrap_t<V2>>( v1, v2 );
 }
@@ -184,7 +184,7 @@ template <
     typename V2, 
     typename = decltype(std::declval<wrap_t<V1>>().get_avx_reg(0))
 >  
-constexpr auto operator/ (V1 const& v1, V2 const& v2) -> vex_op<wrap_t<V1>,'/',wrap_t<V2>>
+constexpr inline auto operator/ (V1 const& v1, V2 const& v2) -> vex_op<wrap_t<V1>,'/',wrap_t<V2>>
 {
     return vex_op<wrap_t<V1>,'/',wrap_t<V2>>( v1, v2 );
 }

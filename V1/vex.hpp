@@ -30,6 +30,8 @@
 #include "x86_cpuid.hpp"
 #include "vmask.hpp"
 
+using CPUID::simd_flags;
+
 #define func auto
 
 // FORWARD DECLARATION
@@ -97,12 +99,14 @@ public:
         }
     }
     
+    /*
     static func simd_flags() -> u8
     {
         static CPUID::CPU cpu;
-        return cpu.supported_simd();
-        //return CPUID::VEXMODE::SSE2;
+        //return cpu.supported_simd();
+        return CPUID::VEXMODE::SSE2;
     }
+    */
     
     static func _alignment() -> int
     {
@@ -165,6 +169,8 @@ public:
     {
         return VMaskedProxy<Vex<T>, C, T1, T2>( *this, mask );
     }
+
+    void operator[] (bool) = delete;
     
     // Size & Memory Management
     func toStream() const -> std::string

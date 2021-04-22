@@ -96,8 +96,7 @@ struct vex_op
 
     func eval() const -> Vex<value_type>
     {
-        auto len = this->size();
-        Vex<value_type> res (len);
+        Vex<value_type> res (this->size());
         eval_op<opcode>::compute(res, v1, v2);
         return res;
     }
