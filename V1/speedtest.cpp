@@ -63,12 +63,12 @@ int main() {
     //std::cout << a << "\n" << b << "\n" << c << "\n" << d << "\n" << e << "\n";
 */
     
-    auto N = 99999999;
+    auto N = 999999999;
     //auto N = 42;
     int s = 0;
     std::srand(std::time(nullptr));
 
-    using T = i32;
+    using T = i8;
         
     
     auto v = Vex<T>(N, 'a'); // [7] * 14
@@ -87,51 +87,56 @@ int main() {
     //     Vex<T> r = vex_add(v, w);
     // }
 
+    int n_tests = 10;
+
+    for (int i=0; i<n_tests; i++)
     {
-        auto t = timing::msTimer("SIMD proxy vex <+> vex");
+        auto t = timing::msTimer("warmup");
         //v += w; // SIMD?
         //v += 7;
-        Vex<T> r = w + v * T(7);
+        Vex<T> r = w*T(2) + v;
     }
 
+    std::cout << "N: " << N << "\n";
+    std::cout << "# tests: " << n_tests << "\n";
+    std::cout << "testing: r = 2*w + v;" << "\n";
+
+    for (int i=0; i<n_tests; i++)
     {
-        auto t = timing::msTimer("SIMD proxy vex <+> vex");
+        auto t = timing::msTimer("vex");
         //v += w; // SIMD?
         //v += 7;
-        Vex<T> r = w + v * T(7);
+        Vex<T> r = w*T(2) + v;
     }
 
-    {
-        auto t = timing::msTimer("SIMD proxy vex <+> vex");
-        //v += w; // SIMD?
-        //v += 7;
-        Vex<T> r = w + v * T(7);
-    }
+    
     
     auto vv = std::vector<T> (N, 'a');
     auto vw = std::vector<T> (N, 2);
     std::vector<T> res;
     //rand_init(vv, N);
     //rand_init(vw, N);
+    for (int i=0; i<n_tests; i++)
     {
-        auto t = timing::msTimer("vector");
+        auto t = timing::msTimer("std::vector");
         res = std::vector<T>(N);
         for (size_t i=0; i<vv.size(); ++i) {
             //vv[i] += vw[i];
             //vv[i] += 7;
             //res[i] = vv[i] + vw[i];
-            res[i] = vw[i] + vv[i] * T(7);
+            res[i] = T(2) * vw[i] + vv[i];
         }
-        s += vv[0];
+        //s += vv[0];
     }
     
     auto va = std::valarray<T> ('a', N);
     auto wa = std::valarray<T> (2, N);
     //rand_init(va, N);
     //rand_init(wa, N);
+    for (int i=0; i<n_tests; i++)
     {
-        auto t = timing::msTimer("valarray");
-        std::valarray<T> res = wa + va * T(7);
+        auto t = timing::msTimer("std::valarray");
+        std::valarray<T> res = wa*T(2) + va;
         //std::valarray<i8> res = va + wa;
         //va += wa;
         //va += 7;
