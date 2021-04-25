@@ -197,6 +197,12 @@ struct sse_register_type<i8>
 };
 
 template<>
+struct sse_register_type<u8> 
+{
+    using type = sse_u8;
+};
+
+template<>
 struct sse_register_type<i16> 
 {
     using type = sse_i16;
@@ -237,6 +243,12 @@ template<>
 struct avx_register_type<i8> 
 {
     using type = avx_i8;
+};
+
+template<>
+struct avx_register_type<u8> 
+{
+    using type = avx_u8;
 };
 
 template<>
