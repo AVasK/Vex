@@ -89,6 +89,17 @@ public:
     : memory(size, fill_value, _alignment())
     {}
 
+    template <typename T2>
+    Vex(Vex<T2> const& other)
+    : memory(other.size(), _alignment())
+    {
+        std::cerr << "Vex<T2> -> Vex<T>\n";
+        for (size_t i=0; i<other.size(); ++i)
+        {
+            memory[i] = static_cast<T>( other[i] );
+        }
+    }
+
     Vex(std::initializer_list<T> ilist)
     : memory(ilist.size(), _alignment())
     {

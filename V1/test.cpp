@@ -36,14 +36,16 @@ bool equal(Vex<T> const& vx, std::vector<T> const& v)
 // #error "AVX2 flag has leaked into user-space"
 // #endif
 
+
+using X1 = vex_valuetype< int, Vex<i8> >;
+using X2 = vex_valuetype< Vex<i8>, Vex<i16> >;
+
+using X3 = reType<Vex<i8>, i16>;
+
 int main()
 {
-    
-    avx_i8 v8 {4};
-    sse_u8 w8 {0};
-    avx_i16 v16 {0};
     int N = 30;
-    using T = i32;
+    using T = i16;
     const auto vec7 = std::vector<T>(N, 7);
     const auto vec3 = std::vector<T>(N, 3);
     const auto vec1 = std::vector<T>(N, 1);
@@ -80,5 +82,23 @@ int main()
     v[v == i16(1)] = v + z;
     // v[1 == 1] = 2; //ERROR
     std::cout << v << "\n";
+    std::cout << eval( 2*w + z ) << "\n";
 
+    auto x = v | otherwise(w);
+    v[v == 2*w+z] = 11 | otherwise(w);
+    std::cout << v << "\n";
+
+    Vex<i8> v8 = {1,1,1,1};
+    Vex<int> v32 = {2,2,2,2};
+    Vex<int> res = Vex<int>(v8) + v32;
+    std::cout << res << "\n";
+
+    Vex<int> arr = {0,1,0,1,0};
+    std::cout << arr << "\n";
+    arr[arr == 0] = 1 | otherwise(0); //flip
+    std::cout << arr << "\n";
+
+    Vex<i32> res2 = vex1 + 2;
+    std::cout << vex1 << "\n";
+    std::cout << res2 << "\n";
 }
