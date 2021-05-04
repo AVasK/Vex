@@ -73,11 +73,39 @@ using vex_valuetype = typename std::conditional<
 >::type;
 
 
+// NOTE : A simpler conversion
+// template <typename V, typename T>
+// using reType = typename
+//     std::conditional<
+//         // std::is_arithmetic to support floats & doubles.
+//         std::is_integral<V>::value, 
+//         T, 
+//         V 
+//     >::type;
 
+// NOTE: A full-blown type conversion function
+// Separated float/double and integral conversions
+// EXAMPLE: Vex<int> + 3.14 
+// The conversion of 3.14 to 3 (silent truncation) 
+// is probably not what one would expect
 template <typename V, typename T>
 using reType = typename
     std::conditional<
-        std::is_arithmetic<V>::value,
-        T,
-        V
+        // std::is_arithmetic to support floats & doubles.
+        std::is_integral<V>::value, // if V is integral
+        typename std::conditional<       // then
+            std::is_integral<T>::value, // if T is integral too, 
+            T, // reType = T
+            V  // V otherwise
+        >::type,
+        // else, if V is not integral
+        typename std::conditional<
+            std::is_floating_point<V>::value, // if V is floating point
+            typename std::conditional<
+                std::is_floating_point<T>::value, // and T is floating point
+                T, // then T
+                V  // otherwise V
+            >::type,
+            V // V is not floating point
+        >::type
     >::type;

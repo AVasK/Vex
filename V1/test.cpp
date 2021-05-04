@@ -1,8 +1,10 @@
 #include <iostream>
 #include <vector>
+#include <valarray>
 #include "integers.hpp"
 #include "vex.hpp"
 #include "simd_types.hpp"
+
 
 #define ASSERT_EQ(a, b) \
     do { \
@@ -94,11 +96,18 @@ int main()
     std::cout << res << "\n";
 
     Vex<int> arr = {0,1,0,1,0};
-    std::cout << arr << "\n";
     arr[arr == 0] = 1 | otherwise(0); //flip
-    std::cout << arr << "\n";
+    
 
     Vex<i32> res2 = vex1 + 2;
     std::cout << vex1 << "\n";
     std::cout << res2 << "\n";
+
+    Vex<float> f1 = {2.2f, 2.2f, 3.14f, 3.14f};
+    Vex<float> r1 = f1 + 3.14;
+    std::cout << r1;
+
+    std::valarray<int> val_f1 (3.14, 4);
+    std::valarray<int> res_f1 = val_f1 + 3.14;
+
 }
