@@ -97,16 +97,24 @@ int main()
 
     Vex<int> arr = {0,1,0,1,0};
     arr[arr == 0] = 1 | otherwise(0); //flip
-    
+
 
     Vex<i32> res2 = vex1 + 2;
     std::cout << vex1 << "\n";
     std::cout << res2 << "\n";
 
-    Vex<float> f1 = {2.2f, 2.2f, 3.14f, 3.14f};
-    Vex<float> r1 = f1 + 3.14;
-    std::cout << r1;
 
+    // Allowed Conversions:
+    // Vex<Integral> supports operands of any Integral type
+    // Vex<FloatingPoint> supports operands of and Integral & Floating point types
+    Vex<float> fvex = {1.2, 2.2, 3.14, 4.2};
+    Vex<i8> ivex = {1, 2, 3, 4};
+    auto ok_1 = fvex + 1; // OK: Vex<float> + int
+    auto ok_2 = ivex + 1; // OK: Vex<i8> + int
+    auto ok_3 = fvex + 2.2; // OK: Vex<float> + double
+    auto error = ivex + 2.2; // ERROR: No truncating downcast by default
+
+    // std::valarray will let you do the truncation, resulting in a warning about implicit conversion.
     std::valarray<int> val_f1 (3.14, 4);
     std::valarray<int> res_f1 = val_f1 + 3.14;
 
