@@ -6,6 +6,9 @@
 template <typename T>
 class Vex;
 
+template <typename V1, typename V2>
+struct twofold;
+
 enum class Comparator {
     EQ,     // ==
     NEQ,    // !=
@@ -70,6 +73,21 @@ public:
         }
     }
 
+    template <typename V1, typename V2>
+    void operator= (twofold<V1, V2> vals)
+    {
+        std::cerr << "v[ ] = a | b\n";
+        for (size_t i = 0; i < vex.size(); i++)
+        {
+            if (mask[i]) {
+                vex[i] = vals.v1[i];
+            }
+            else {
+                vex[i] = vals.v2[i];
+            }
+        }
+    }
+
     void operator+= (value_type val)
     {
         for (size_t i = 0; i < vex.size(); i++)
@@ -123,3 +141,39 @@ inline auto operator== (V1 const& vex, V2 const& v2) -> VMask<Comparator::EQ, wr
 //     std::cerr << "VAL: " << val << "\n";
 //     return VMask<bool, Vex<T>, Val<T>>(vex, Val<T>(val));
 // }
+
+template <typename V>
+struct Otherwise {
+    using value_type = typename wrap_t<V>::value_type;
+
+    explicit Otherwise (V const& val)
+    : value {val}
+    {}
+
+    V const& value;
+};
+
+template <typename V>
+auto otherwise (V const& v) -> Otherwise<V>
+{
+    return Otherwise<V>(v);
+}
+
+template <typename V1, typename V2>
+struct twofold {
+    //static_assert(std::is_same<typename wrap_t<V1>::value_type, typename wrap_t<V2>::value_type>::value, "ERROR: value_types must be equal");
+    
+    explicit twofold (V1 const& _v1, V2 const& _v2)
+    : v1 {_v1}
+    , v2 {_v2}
+    {}
+
+    wrap_t<V1> v1;
+    wrap_t<V2> v2;
+};
+
+template <typename V1, typename V2>
+auto operator| (V1 const& v1, Otherwise<V2> v2) -> twofold<V1, V2>
+{
+    return twofold<V1, V2> (v1, v2.value);
+}
