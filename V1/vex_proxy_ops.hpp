@@ -34,8 +34,10 @@ struct eval_op {};
 
 template<>
 struct eval_op<'+'> {
+    // compute for integral T
     template <typename T, typename V1, typename V2>
-    static inline void compute(Vex<T> & res, V1 const& v1, V2 const& v2)
+    static inline auto compute(Vex<T> & res, V1 const& v1, V2 const& v2) 
+    -> typename std::enable_if<!std::is_floating_point<T>::value>::type
     {
     #ifdef __AVX2__
         mul_avx(res, v1, v2);
@@ -51,12 +53,34 @@ struct eval_op<'+'> {
         }
     #endif
     }
+
+    // compute for floating point T
+    template <typename T, typename V1, typename V2>
+    static inline auto compute(Vex<T> & res, V1 const& v1, V2 const& v2) 
+    -> typename std::enable_if<std::is_floating_point<T>::value>::type
+    {
+    #ifdef __AVX__
+        mul_avx(res, v1, v2);
+    #else
+
+        auto flags = simd_flags();
+        if ( flags & SIMD::AVX )
+        { 
+            add_avx(res, v1, v2);
+        }
+        else {
+            add_sse(res, v1, v2);
+        }
+    #endif
+    }
 };
 
 template<>
 struct eval_op<'-'> {
+    // compute for Integral T
     template <typename T, typename V1, typename V2>
-    static inline void compute(Vex<T> & res, V1 const& v1, V2 const& v2)
+    static inline auto compute(Vex<T> & res, V1 const& v1, V2 const& v2)
+    -> typename std::enable_if<std::is_integral<T>::value>::type
     {
     #ifdef __AVX2__
         mul_avx(res, v1, v2);
@@ -72,12 +96,34 @@ struct eval_op<'-'> {
         }
     #endif
     }
+
+    // compute for Floating Point T
+    template <typename T, typename V1, typename V2>
+    static inline auto compute(Vex<T> & res, V1 const& v1, V2 const& v2)
+    -> typename std::enable_if<std::is_floating_point<T>::value>::type
+    {
+    #ifdef __AVX__
+        mul_avx(res, v1, v2);
+    #else
+
+        auto flags = simd_flags();
+        if ( flags & SIMD::AVX )
+        { 
+            sub_avx(res, v1, v2);
+        }
+        else {
+            sub_sse(res, v1, v2);
+        }
+    #endif
+    }
 };
 
 template<>
 struct eval_op<'*'> {
+    // compute for Integral T
     template <typename T, typename V1, typename V2>
-    static inline void compute(Vex<T> & res, V1 const& v1, V2 const& v2)
+    static inline auto compute(Vex<T> & res, V1 const& v1, V2 const& v2)
+    -> typename std::enable_if<std::is_integral<T>::value>::type
     {
     #ifdef __AVX2__
         mul_avx(res, v1, v2);
@@ -94,52 +140,68 @@ struct eval_op<'*'> {
     #endif
     }
 
-    /*
-    // SPECIAL CASES:
-    // i32:
-    template<typename V1, typename V2>
-    static inline void compute(Vex<i32> & res, V1 const& v1, V2 const& v2)
-    {
-    #ifdef __AVX2__
-        mul_avx(res, v1, v2);
-    #elif __SSE4_1__ 
-        mul_sse(res, v1, v2);
-    #else
     
-        auto flags = Vex<i32>::simd_flags();
-        if (flags & SIMD::AVX2) {
-            std::cerr << "AVX2 mul i32\n";
+    // compute for Floating Point T
+    template <typename T, typename V1, typename V2>
+    static inline auto compute(Vex<T> & res, V1 const& v1, V2 const& v2)
+    -> typename std::enable_if<std::is_floating_point<T>::value>::type
+    {
+    #ifdef __AVX__
+        mul_avx(res, v1, v2);
+    #else
+
+        auto flags = simd_flags();
+        if ( flags & SIMD::AVX )
+        { 
             mul_avx(res, v1, v2);
         }
-        else if (flags & SIMD::SSE4_1) {
-            std::cerr << "SSE4.1 mul i32\n";
-            mul_sse(res, v1, v2);
-        }
         else {
-            std::cerr << "Fallback to non-SIMD case\n";
-            for (size_t i=0; i < res.size(); ++i)
-            {
-                res[i] = v1[i] + v2[i];
-            }
+            mul_sse(res, v1, v2);
         }
     #endif
     }
-*/
 };
 
 
 template<>
 struct eval_op<'/'> {
+    // compute for Integral T
     template <typename T, typename V1, typename V2>
-    static inline void compute(Vex<T> & res, V1 const& v1, V2 const& v2)
+    static inline auto compute(Vex<T> & res, V1 const& v1, V2 const& v2)
+    -> typename std::enable_if<std::is_integral<T>::value>::type
     {
+        for (size_t i=0; i < res.size(); i++)
+        {
+            res[i] = v1[i] / v2[i];
+        }
+        // SIMD versions not implemented yet, they're tricky 
+        // since no SIMD division is present in hardware for int
+        // auto flags = simd_flags();
+        // if ( flags & SIMD::AVX2 )
+        // { 
+        //     div_avx(res, v1, v2);
+        // }
+        // else {
+        //     div_sse(res, v1, v2);
+        // }
+    }
+
+    // compute for Floating Point T
+    template <typename T, typename V1, typename V2>
+    static inline auto compute(Vex<T> & res, V1 const& v1, V2 const& v2)
+    -> typename std::enable_if<std::is_floating_point<T>::value>::type
+    {
+    #ifdef __AVX__
+            div_avx(res, v1, v2);
+    #else
         auto flags = simd_flags();
-        if ( flags & SIMD::AVX2 )
+        if ( flags & SIMD::AVX )
         { 
             div_avx(res, v1, v2);
         }
         else {
             div_sse(res, v1, v2);
         }
+    #endif
     }
 };

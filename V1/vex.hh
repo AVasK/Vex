@@ -58,43 +58,6 @@ func Vex<T>::operator+= (T other) -> Vex<T>&
     return *this;
 }
 
-
-template <typename T>
-func vex_add (Vex<T> const& v1, Vex<T> const& v2) -> Vex<T>
-{
-    Vex<T> res (v1.size());
-
-    if (Vex<T>::simd_flags() & SIMD::AVX2) {
-        add_avx(res, v1, v2);
-    }
-    else if (Vex<T>::simd_flags() & SIMD::SSE2) {
-        add_sse(res, v1, v2);
-    }
-    return res;
-}
-
-
-template<typename T>
-inline func vex_add (Vex<T> const& vex, T value) -> Vex<T>
-{
-    Vex<T> res (vex.size());
-    
-    if (Vex<T>::simd_flags() & SIMD::AVX2) {
-        addval_avx(res, vex, value);
-    }
-    else if (Vex<T>::simd_flags() & SIMD::SSE2) {
-        addval_sse(res, vex, value);
-    }
-    return res;
-}
-
-template<typename T>
-func vex_add (T value, Vex<T> const& vex) -> Vex<T>
-{
-    return vex_add(vex, value);
-}
-
-
 // ===============================
 // ========= Subtraction =========
 // ===============================
@@ -127,43 +90,6 @@ func Vex<T>::operator-= (T other) -> Vex<T>&
     }
     return *this;
 }
-
-
-template <typename T>
-func vex_sub (Vex<T> const& v1, Vex<T> const& v2) -> Vex<T>
-{
-    Vex<T> res (v1.size());
-
-    if (Vex<T>::simd_flags() & SIMD::AVX2) {
-        sub_avx(res, v1, v2);
-    }
-    else if (Vex<T>::simd_flags() & SIMD::SSE2) {
-        sub_sse(res, v1, v2);
-    }
-    return res;
-}
-
-
-template<typename T>
-inline func vex_sub (Vex<T> const& vex, T value) -> Vex<T>
-{
-    Vex<T> res (vex.size());
-    
-    if (Vex<T>::simd_flags() & SIMD::AVX2) {
-        subval_avx(res, vex, value);
-    }
-    else if (Vex<T>::simd_flags() & SIMD::SSE2) {
-        subval_sse(res, vex, value);
-    }
-    return res;
-}
-
-template<typename T>
-func vex_sub (T value, Vex<T> const& vex) -> Vex<T>
-{
-    return vex_sub(vex, value);
-}
-
 
 // ===============================
 // ======= Multiplication ========
@@ -199,7 +125,7 @@ func Vex<T>::operator*= (T other) -> Vex<T>&
 }
 
 template <typename T>
-func vex_mul (Vex<T> const& v1, Vex<T> const& v2) -> Vex<T>
+inline func mul (Vex<T> const& v1, Vex<T> const& v2) -> Vex<T>
 {
     Vex<T> res (v1.size());
 
@@ -214,7 +140,7 @@ func vex_mul (Vex<T> const& v1, Vex<T> const& v2) -> Vex<T>
 
 
 template<typename T>
-inline func vex_mul (Vex<T> const& vex, T value) -> Vex<T>
+inline func mul (Vex<T> const& vex, T value) -> Vex<T>
 {
     Vex<T> res (vex.size());
     
@@ -228,9 +154,9 @@ inline func vex_mul (Vex<T> const& vex, T value) -> Vex<T>
 }
 
 template<typename T>
-func vex_mul (T value, Vex<T> const& vex) -> Vex<T>
+inline func mul (T value, Vex<T> const& vex) -> Vex<T>
 {
-    return vex_mul(vex, value);
+    return mul(vex, value);
 }
 
 

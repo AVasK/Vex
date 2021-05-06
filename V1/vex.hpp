@@ -38,39 +38,16 @@ using CPUID::simd_flags;
 template <typename T>
 class Vex;
 
-template <typename T>
-struct VSum;
-template <typename T>
-struct VISum;
-
 
 // Friend functions
 template <typename T>
-func vex_add (Vex<T> const&, Vex<T> const&) -> Vex<T>;
+func mul (Vex<T> const&, Vex<T> const&) -> Vex<T>;
 
 template <typename T>
-func vex_add (Vex<T> const&, T) -> Vex<T>;
+func mul (Vex<T> const&, T) -> Vex<T>;
 
 template <typename T>
-func vex_add (T, Vex<T> const&) -> Vex<T>;
-
-template <typename T>
-func vex_sub (Vex<T> const&, Vex<T> const&) -> Vex<T>;
-
-template <typename T>
-func vex_sub (Vex<T> const&, T) -> Vex<T>;
-
-template <typename T>
-func vex_sub (T, Vex<T> const&) -> Vex<T>;
-
-template <typename T>
-func vex_mul (Vex<T> const&, Vex<T> const&) -> Vex<T>;
-
-template <typename T>
-func vex_mul (Vex<T> const&, T) -> Vex<T>;
-
-template <typename T>
-func vex_mul (T, Vex<T> const&) -> Vex<T>;
+func mul (T, Vex<T> const&) -> Vex<T>;
 
 
 // Vex class
@@ -213,17 +190,9 @@ public:
     func operator*= (T value) -> Vex&;
     
     // Friend Binary Ops
-    friend func vex_add<T> (Vex const& a1, Vex const& a2) -> Vex;
-    friend func vex_add<T> (Vex const& a1, T value) -> Vex;
-    friend func vex_add<T> (T value, Vex const& a1) -> Vex;
-
-    friend func vex_sub<T> (Vex const& a1, Vex const& a2) -> Vex;
-    friend func vex_sub<T> (Vex const& a1, T value) -> Vex;
-    friend func vex_sub<T> (T value, Vex const& a1) -> Vex;
-
-    friend func vex_mul<T> (Vex const& a1, Vex const& a2) -> Vex;
-    friend func vex_mul<T> (Vex const& a1, T value) -> Vex;
-    friend func vex_mul<T> (T value, Vex const& a1) -> Vex;
+    friend func mul<T> (Vex const& a1, Vex const& a2) -> Vex;
+    friend func mul<T> (Vex const& a1, T value) -> Vex;
+    friend func mul<T> (T value, Vex const& a1) -> Vex;
     
 protected:
     Contiguous<T> memory;
