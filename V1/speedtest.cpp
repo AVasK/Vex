@@ -66,7 +66,7 @@ int main() {
     auto N = 100000000;
     //auto N = 42;
 
-    using T = float;
+    using T = i8;//float;
         
     
     auto v = Vex<T>(N, 'a'); // [7] * 14
@@ -92,7 +92,7 @@ int main() {
         auto t = timing::msTimer("warmup");
         //v += w; // SIMD?
         //v += 7;
-        Vex<T> r = w + v + 2;
+        Vex<T> r = w + v*2;
     }
 
     std::cout << "N: " << N << "\n";
@@ -104,7 +104,7 @@ int main() {
         auto t = timing::msTimer("vex");
         //v += w; // SIMD?
         //v += 7;
-        Vex<T> r = w + v + 2;
+        Vex<T> r = w + v*2;
     }
 
     
@@ -122,7 +122,7 @@ int main() {
             //vv[i] += vw[i];
             //vv[i] += 7;
             //res[i] = vv[i] + vw[i];
-            res[i] = vw[i] + vv[i] + 2;
+            res[i] = vw[i] + vv[i]*2;
         }
         //s += vv[0];
     }
@@ -134,7 +134,7 @@ int main() {
     for (int i=0; i<n_tests; i++)
     {
         auto t = timing::msTimer("std::valarray");
-        std::valarray<T> res = wa + va + 2;
+        std::valarray<T> res = wa + va*2;
         //std::valarray<i8> res = va + wa;
         //va += wa;
         //va += 7;
