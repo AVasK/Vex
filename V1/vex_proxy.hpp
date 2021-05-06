@@ -62,17 +62,16 @@ struct vex_op
         return eval();
     }
 
-
-    // template <typename _T>
-    // operator Vex<_T> ()
-    // {
-    //     Vex<_T> res( size() );
-    //     for (size_t i=0; i<size(); ++i)
-    //     {
-    //         res[i] = this->operator[](i);
-    //     }
-    //     return res;
-    // }
+    template <typename _T>
+    operator Vex<_T> () const
+    {
+        Vex<_T> res( size() );
+        for (size_t i=0; i<size(); ++i)
+        {
+            res[i] = this->operator[](i);
+        }
+        return res;
+    }
 
 
     constexpr func size() const -> size_t

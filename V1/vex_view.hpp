@@ -41,7 +41,7 @@ public:
     }
 
 private:
-    Contiguous<T> & memory;
+    Aligned<T> & memory;
 };
 
 template <typename T>
@@ -63,6 +63,6 @@ public:
     }
 
 private:
-    Contiguous<T> const& memory;
+    Aligned<T> const& memory;
 };
 

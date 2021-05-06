@@ -34,12 +34,12 @@
 #define func auto
 
 
-// The Contiguous memory has the granularity of
-// the underlying MMX | XMM | YMM | ZMM registers (== alignment)
-// register (XMM|YMM|whatever) = [_|_|_|_] can contain reg_size/sizeof(T) elements
+// The Aligned memory has the granularity of
+// the underlying XMM | YMM | ZMM registers (same as alignment)
+// register (XMM|YMM|whatever) can contain reg_size/sizeof(T) elements
 // of type T
 // => since the memory class should map directly to registers,
-// [_|_|_|_][_|_|_|_] (cannot add incomplete register: [_|])
+// memory is always divisible by the size of the register.
 
 // Computes the blocksize such that
 // blocksize is evenly divisible by the #of_elements of type T
@@ -53,25 +53,23 @@ static inline func blocksize(size_t n, size_t reg_size) -> size_t
 }
 
 
-
-
 // TODO: Add .what at least
 struct MemoryException {};
 
 
-/// Contiguous memory of type T
+/// Aligned memory of type T
 /// aligned @ <align>-byte boundary
 /// NOTE: Since the alignment is chosen given the CPUID info
 ///       @ runtime => "align" shouldn't be a template parameter
 ///       but rather fed into the C'tor.
 template <typename T>
-class Contiguous {
+class Aligned {
 public:
     
     // C'tors & stuff
     
     // no initialization (for temporaries)
-    Contiguous(size_t size, size_t align)
+    Aligned(size_t size, size_t align)
     : alignment {align}
     , capacity {blocksize<T>( size, align )}
     , used {size}
@@ -82,7 +80,7 @@ public:
         }
     }
     
-    Contiguous(size_t size, T fill_value, size_t align)
+    Aligned(size_t size, T fill_value, size_t align)
     : alignment {align}
     , capacity {blocksize<T>( size, align )}
     , used {size}
@@ -97,13 +95,13 @@ public:
         }
     }
     
-    ~Contiguous()
+    ~Aligned()
     {
         aligned::free(data);
     }
     
     // Copy ops
-    Contiguous(Contiguous const& other)
+    Aligned(Aligned const& other)
     : alignment {other.alignment}
     , capacity {other.capacity}
     , used {other.used}
@@ -113,14 +111,10 @@ public:
         {
             throw MemoryException {};
         }
-        //for (int i=0; i<used; ++i)
-        //{
-        //    data[i] = other.data[i];
-        //}
         std::memcpy(data, other.data, used*sizeof(T));
     }
     
-    func operator= (Contiguous const& other) -> Contiguous&
+    func operator= (Aligned const& other) -> Aligned&
     {
         capacity = other.capacity;
         used = other.used;
@@ -130,17 +124,12 @@ public:
         {
             throw MemoryException {};
         }
-        //for (int i=0; i<used; ++i)
-        //{
-        //    data[i] = other.data[i]; //TODO: use memcpy instead
-        //}
-        
         std::memcpy(data, other.data, used*sizeof(T));
         return *this;
     }
     
     // Move ops
-    Contiguous(Contiguous && other)
+    Aligned(Aligned && other)
     : alignment {other.alignment}
     , capacity {other.capacity}
     , used {other.used}
@@ -151,7 +140,7 @@ public:
         other.data = nullptr;
     }
     
-    func operator= (Contiguous && other) -> Contiguous&
+    func operator= (Aligned && other) -> Aligned&
     {
         capacity = other.capacity;
         used = other.used;
@@ -193,27 +182,16 @@ public:
     }
     
     // Addressing
-    __attribute__((always_inline))
     inline func operator[] (size_t idx) -> T&
     {
-        //if ((unsigned)idx <= used)
             return data[idx];
-        //else
-        //    throw MemoryException {};
     }
     
-    __attribute__((always_inline))
     inline func operator[] (size_t idx) const -> const T&
     {
-        //if ((unsigned)idx <= used)
             return data[idx];
-        //else
-        //    throw MemoryException {};
     }
-    
-    // TODO: Add .at() bounds-checked.
 
-    
     // toString
     func toString() const -> std::string
     {
@@ -222,7 +200,6 @@ public:
             << "| Capacity: " << capacity    << "\n"
             << "| Used:     " << used        << "\n"
             << "| @:        " << data        << "\n"
-            << "| (long) @: " << (long)data  << "\n"
             << "| @ % 16    " <<(long)data%16<< "\n"
             << "| @ % 32    " <<(long)data%32<< "\n"
             << "| @ % 64    " <<(long)data%64<< "\n"
@@ -262,7 +239,7 @@ protected:
 
 
 template <typename T>
-std::ostream& operator<<(std::ostream& os, Contiguous<T> const& mem)
+std::ostream& operator<<(std::ostream& os, Aligned<T> const& mem)
 {
     os << mem.toString();
     return os;

@@ -171,12 +171,12 @@ public:
         return memory.size();
     }
 
-    func data() -> Contiguous<T>&
+    func data() -> Aligned<T>&
     {
         return memory;
     }
 
-    func data() const -> Contiguous<T> const&
+    func data() const -> Aligned<T> const&
     {
         return memory;
     }
@@ -195,7 +195,7 @@ public:
     friend func mul<T> (T value, Vex const& a1) -> Vex;
     
 protected:
-    Contiguous<T> memory;
+    Aligned<T> memory;
 };
 
 // Intrinsic wrappers lie in another file to avoid clutter...

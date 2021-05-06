@@ -37,34 +37,18 @@ void rand_init(T & array_like, size_t N)
     }
 }
 
-int main() {
-    
-/*
-#if ARCH_x86
-    #if ARCH_x86_64
-    std::cout << "x86/64 processor\n";
-    #elif
-    std::cout << "x86 processor architecture\n";
-    #endif
-#endif
-    
-    std::cout << "C++" << CPP_V << "\n";
-    if (CPP_V >= 11) {
-        std::cout << "...";
-    }
-
-    
-    Contiguous<int> a(11, 16);
-    Contiguous<long> b(17, 7, 32);
-    auto c = b;
-    auto d = std::move(a);
-    auto e = Contiguous<int16_t>(17, 1, 8);
-        
-    //std::cout << a << "\n" << b << "\n" << c << "\n" << d << "\n" << e << "\n";
-*/
-    
+int main(int argc, char* argv[]) {
     auto N = 100000000;
     //auto N = 42;
+    if (argc == 2)
+    {
+        N = std::atoi( argv[1] );
+        std::cout << "N = " << N << ";\n"; 
+    }
+    else {
+        std::cout << "default N = " << N << ";\n"; 
+    }
+
 
     using T = i8;//float;
         
