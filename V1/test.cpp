@@ -52,8 +52,6 @@ int main()
     const auto vec3 = std::vector<T>(N, 3);
     const auto vec1 = std::vector<T>(N, 1);
     auto vex3 = Vex<T>(N, 3);
-    auto fvex = Vex<float>(N, 3.0);
-    fvex += Vex<float>(N, 0.1415);
     ASSERT_EQ(vex3, vec3);
     auto vex1 = Vex<T>(N, 1);
     auto vex2 = Vex<T>(N, 2);
@@ -112,7 +110,7 @@ int main()
     auto ok_1 = fvex + 1; // OK: Vex<float> + int
     auto ok_2 = ivex + 1; // OK: Vex<i8> + int
     auto ok_3 = fvex + 2.2; // OK: Vex<float> + double
-    auto error = ivex + 2.2; // ERROR: No truncating downcast by default
+    // auto error = ivex + 2.2; // ERROR: No truncating downcast by default
 
     // std::valarray will let you do the truncation, resulting in a warning about implicit conversion.
     std::valarray<int> val_f1 (3.14, 4);
