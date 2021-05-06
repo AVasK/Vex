@@ -63,8 +63,9 @@ struct vex_op
     }
 
     template <typename _T>
-    operator Vex<_T> ()
+    operator Vex<_T> () const
     {
+        std::cerr << "Conversion\n";
         Vex<_T> res( size() );
         for (size_t i=0; i<size(); ++i)
         {
@@ -72,6 +73,7 @@ struct vex_op
         }
         return res;
     }
+
 
     constexpr func size() const -> size_t
     {
@@ -91,17 +93,19 @@ struct vex_op
 
     func get_sse_reg (size_t idx) const -> sse_reg<value_type>
     {
-        auto _r1 = v1.get_sse_reg(idx);
-        auto _r2 = v2.get_sse_reg(idx);
-        return op<opcode>(_r1, _r2);
+        return simd_op<opcode, value_type>::sse_reg(idx, v1, v2);
+        // auto _r1 = v1.get_sse_reg(idx);
+        // auto _r2 = v2.get_sse_reg(idx);
+        // return op<opcode>(_r1, _r2);
     }
 
     __attribute__((target("avx2")))
     func get_avx_reg (size_t idx) const -> avx_reg<value_type>
     {
-        auto _r1 = v1.get_avx_reg(idx);
-        auto _r2 = v2.get_avx_reg(idx);
-        return op<opcode>(_r1, _r2);
+        return simd_op<opcode, value_type>::avx_reg(idx, v1, v2);
+        // auto _r1 = v1.get_avx_reg(idx);
+        // auto _r2 = v2.get_avx_reg(idx);
+        // return op<opcode>(_r1, _r2);
     }
 
 

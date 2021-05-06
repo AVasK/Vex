@@ -32,6 +32,29 @@ using CPUID::simd_flags;
 template <char opcode>
 struct eval_op {};
 
+
+template<char opcode, typename T>
+struct simd_op {
+    // avx
+    template <typename V1, typename V2, typename vtype = typename V1::value_type>
+    __attribute__((target("avx2")))
+    static inline auto avx_reg(size_t i, V1 const& v1, V2 const& v2) -> avx_reg<vtype>
+    {
+        auto _r1 = v1.get_avx_reg(i);
+        auto _r2 = v2.get_avx_reg(i);
+        return op<opcode>(_r1, _r2);
+    }
+    // sse
+    template <typename V1, typename V2, typename vtype = typename V1::value_type>
+    static inline auto sse_reg(size_t i, V1 const& v1, V2 const& v2) -> sse_reg<vtype>
+    {
+        auto _r1 = v1.get_sse_reg(i);
+        auto _r2 = v2.get_sse_reg(i);
+        return op<opcode>(_r1, _r2);
+    }
+};
+
+
 template<>
 struct eval_op<'+'> {
     // compute for integral T
@@ -74,6 +97,8 @@ struct eval_op<'+'> {
     #endif
     }
 };
+
+
 
 template<>
 struct eval_op<'-'> {
@@ -158,6 +183,38 @@ struct eval_op<'*'> {
         else {
             mul_sse(res, v1, v2);
         }
+    #endif
+    }
+};
+
+template<>
+struct simd_op<'*', i32> {
+    // avx
+    template <typename V1, typename V2, typename vtype = typename V1::value_type>
+    __attribute__((target("avx2")))
+    __attribute__((always_inline))
+    static inline auto avx_reg(size_t i, V1 const& v1, V2 const& v2) -> avx_reg<vtype>
+    {
+        auto _r1 = v1.get_avx_reg(i);
+        auto _r2 = v2.get_avx_reg(i);
+        return _r1 * _r2;
+    }
+    // sse
+    template <typename V1, typename V2, typename vtype = typename V1::value_type>
+    static inline auto sse_reg(size_t i, V1 const& v1, V2 const& v2) -> sse_reg<vtype>
+    {
+    #ifdef __SSE4_1__
+        auto _r1 = v1.get_sse_reg(i);
+        auto _r2 = v2.get_sse_reg(i);
+        return i32_mul_sse4_1(_r1, _r2);
+    #else
+        constexpr const auto n_elements = sse_offset<i32>::value;
+        i32 values[n_elements];
+        for (int pos=0; pos<n_elements; pos++)
+        {
+            values[pos] = v1[i+pos] * v2[i+pos];
+        }
+        return load_sse(&values[0]);
     #endif
     }
 };
