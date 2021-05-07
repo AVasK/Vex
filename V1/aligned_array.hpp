@@ -114,18 +114,26 @@ public:
         std::memcpy(data, other.data, used*sizeof(T));
     }
     
+
     func operator= (Aligned const& other) -> Aligned&
     {
-        capacity = other.capacity;
-        used = other.used;
-        alignment = other.alignment;
-        data = aligned::alloc<T>( capacity, alignment );
-        if (!data)
-        {
-            throw MemoryException {};
+        if ( other.size() <= this->capacity ) {
+            // capacity sufficient, copying...
+            std::memcpy(data, other.data, other.used*sizeof(T));
+            used = other.used;
+            return *this;
         }
-        std::memcpy(data, other.data, used*sizeof(T));
-        return *this;
+        else {  // memory reallocation needed
+            auto new_data = aligned::alloc<T>( other.used, alignment );
+            if (!new_data) throw MemoryException{};
+            std::memcpy(new_data, other.data, other.used*sizeof(T));
+            aligned::free(data);
+
+            capacity = other.used;
+            used = other.used;
+            data = new_data;
+            return *this;
+        }
     }
     
     // Move ops
