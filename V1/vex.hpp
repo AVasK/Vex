@@ -157,10 +157,19 @@ public:
     {
         return VMaskedProxy<Vex<T>, C, T1, T2>( *this, mask );
     }
-
-    void operator[] (bool) = delete;
     
     // Size & Memory Management
+
+    void push(value_type elem)
+    {
+        memory.push( elem );
+    }
+
+    func pop() -> value_type
+    {
+        return memory.pop();
+    }
+
     func toStream() const -> std::string
     {
         return memory.toString();

@@ -129,12 +129,47 @@ public:
             std::memcpy(new_data, other.data, other.used*sizeof(T));
             aligned::free(data);
 
-            capacity = other.used;
-            used = other.used;
             data = new_data;
+            used = other.used;
+            capacity = other.used;
             return *this;
         }
     }
+
+
+    void resize(size_t new_capacity)
+    {
+        auto new_data = aligned::alloc<T>( new_capacity, alignment );
+        if (!new_data) throw MemoryException{};
+        std::memcpy(new_data, this->data, std::min(this->used, new_capacity)*sizeof(T));
+        aligned::free(data);
+
+        this->data = new_data;
+        this->capacity = new_capacity;
+    }
+
+
+    void push(T elem)
+    {
+        if ( used >= capacity ) {
+            this->resize(capacity * 2);
+        }
+        data[used] = elem;
+        used += 1;
+    }
+
+    T pop()
+    {
+        if (used < (capacity / 2)-8)
+        {
+            auto new_capacity = blocksize<T>( used-1, alignment );
+            if (new_capacity != capacity) {
+                this->resize(new_capacity);
+            }
+        }
+        return data[used--];
+    }
+
     
     // Move ops
     Aligned(Aligned && other)
@@ -207,7 +242,7 @@ public:
         oss << "*--------------------------------\n"
             << "| Capacity: " << capacity    << "\n"
             << "| Used:     " << used        << "\n"
-            << "| @:        " << data        << "\n"
+            << "| @:        " << (void*)data << "\n"
             << "| @ % 16    " <<(long)data%16<< "\n"
             << "| @ % 32    " <<(long)data%32<< "\n"
             << "| @ % 64    " <<(long)data%64<< "\n"
