@@ -191,12 +191,22 @@ public:
     }
     
     // Arithmetics:
-    func operator+= (Vex const& other) -> Vex&;
     func operator+= (T value) -> Vex&;
+    template <typename Vexlike>
+    func operator+= (Vexlike const& other)
+    -> typename std::enable_if<std::is_same<T, typename Vexlike::value_type>::value, Vex&>::type;
+
     func operator-= (Vex const& other) -> Vex&;
     func operator-= (T value) -> Vex&;
+    template <typename Vexlike>
+    func operator-= (Vexlike const& other) 
+    -> typename std::enable_if<std::is_same<T, typename Vexlike::value_type>::value, Vex&>::type;
+
     func operator*= (Vex const& other) -> Vex&;
     func operator*= (T value) -> Vex&;
+    template <typename Vexlike>
+    func operator*= (Vexlike const& other) 
+    -> typename std::enable_if<std::is_same<T, typename Vexlike::value_type>::value, Vex&>::type;
     
     // Friend Binary Ops
     friend func mul<T> (Vex const& a1, Vex const& a2) -> Vex;

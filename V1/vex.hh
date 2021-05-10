@@ -30,8 +30,11 @@
 // ========== Addition ===========
 // ===============================
 
+
 template<typename T>
-func Vex<T>::operator+= (Vex<T> const& other) -> Vex<T>&
+template<typename Vexlike>
+func Vex<T>::operator+= (Vexlike const& other) 
+-> typename std::enable_if<std::is_same<T, typename Vexlike::value_type>::value, Vex&>::type
 {
     if (simd_flags() & SIMD::AVX2) {
         add_avx(*this, *this, other);
@@ -64,7 +67,9 @@ func Vex<T>::operator+= (T other) -> Vex<T>&
 
 
 template<typename T>
-func Vex<T>::operator-= (Vex<T> const& other) -> Vex<T>&
+template<typename Vexlike>
+func Vex<T>::operator-= (Vexlike const& other) 
+-> typename std::enable_if<std::is_same<T, typename Vexlike::value_type>::value, Vex&>::type
 {
     if (simd_flags() & SIMD::AVX2) {
         sub_avx(*this, *this, other);
@@ -97,7 +102,9 @@ func Vex<T>::operator-= (T other) -> Vex<T>&
 
 
 template<typename T>
-func Vex<T>::operator*= (Vex<T> const& other) -> Vex<T>&
+template<typename Vexlike>
+func Vex<T>::operator*= (Vexlike const& other) 
+-> typename std::enable_if<std::is_same<T, typename Vexlike::value_type>::value, Vex&>::type
 {
     if (simd_flags() & SIMD::AVX2) {
         mul_avx(*this, *this, other);
