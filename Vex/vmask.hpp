@@ -125,13 +125,16 @@ private:
 template <
     typename V1, 
     typename V2,
+    typename T = vex_type<V1, V2>,
+    typename VX1 = wrap_t<reType<V1, T>>,
+    typename VX2 = wrap_t<reType<V2, T>>,
     //typename _vtype = typename V1::value_type,
     //typename = typename std::enable_if< std::is_convertible<V1, Vex<_vtype>>::value >::type
     typename = decltype(std::declval<wrap_t<V1>>().get_avx_reg(0))
 >
-inline auto operator== (V1 const& vex, V2 const& v2) -> VMask<Comparator::EQ, wrap_t<V1>, wrap_t<V2>>
+inline auto operator== (V1 const& vex, V2 const& v2) -> VMask<Comparator::EQ, wrap_t<VX1>, wrap_t<VX2>>
 {
-    return VMask<Comparator::EQ, wrap_t<V1>, wrap_t<V2>>(vex, v2);
+    return VMask<Comparator::EQ, wrap_t<VX1>, wrap_t<VX2>>(vex, v2);
 }
 
 
