@@ -77,9 +77,9 @@ int main()
     Vex<i16> w = {1, 0, 1, 0};
     Vex<i16> z = {5,5,5,5};
     (w + v)[0];
-    v[w + v == i16(0)] = 7;
+    v[w + v == 0] = 7;
     //v[v == i16(0)] = 1;
-    v[v == i16(1)] = v + z;
+    v[v == 1] = v + z;
     // v[1 == 1] = 2; //ERROR
     std::cout << v << "\n";
     std::cout << eval( 2*w + z ) << "\n";
