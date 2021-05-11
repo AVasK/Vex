@@ -6,7 +6,7 @@
 - [x] Basic Array class + ops 
 - [x] Vectorization, e.t.c
 - [x] Proxy class for efficient chaining of operations
-- [ ] Masking: [ extern vex<i16> a; a[a >= 0] = ... ]
+- [x] Masking: [ extern vex<i16> a; a[a >= 0] = ... ]
 - [x] Add mul/div/max/other ops
 - [x] Optimize
-- [ ] Cleanup! 
+- [x] Cleanup! 
