@@ -5,8 +5,7 @@
 - [x] Reading CPUID  
 - [x] Basic Array class + ops 
 - [x] Vectorization, e.t.c
-- [x] Proxy class for efficient chaining of operations
-- [x] Masking: [ extern vex<i16> a; a[a >= 0] = ... ]
-- [x] Add mul/div/max/other ops
+- [x] Expression Templates for efficient chaining of operations
+- [x] Masking: [ e.g: a[a == b] = c + d ]
 - [x] Optimize
 - [x] Cleanup! 
