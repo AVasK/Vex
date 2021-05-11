@@ -1,0 +1,6 @@
+vex: (4, 4.8, 6)
+warmup: (4, 4.45, 9)
+APPLE: (4, 5.0, 6)
+openBLAS: (4, 5.55, 10)
+std::vector: (4, 5.2, 8)
+std::valarray: (4, 5.0, 8)

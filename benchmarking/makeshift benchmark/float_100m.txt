@@ -1,0 +1,80 @@
+vex timer time: 58 ms
+vex timer time: 57 ms
+vex timer time: 57 ms
+vex timer time: 58 ms
+vex timer time: 57 ms
+vex timer time: 58 ms
+vex timer time: 57 ms
+vex timer time: 58 ms
+vex timer time: 57 ms
+vex timer time: 58 ms
+warmup timer time: 55 ms
+warmup timer time: 51 ms
+warmup timer time: 54 ms
+warmup timer time: 53 ms
+warmup timer time: 53 ms
+warmup timer time: 53 ms
+warmup timer time: 51 ms
+warmup timer time: 52 ms
+warmup timer time: 52 ms
+warmup timer time: 53 ms
+APPLE BLAS SAXPY timer time: 54 ms
+APPLE BLAS SAXPY timer time: 51 ms
+APPLE BLAS SAXPY timer time: 54 ms
+APPLE BLAS SAXPY timer time: 53 ms
+APPLE BLAS SAXPY timer time: 53 ms
+APPLE BLAS SAXPY timer time: 53 ms
+APPLE BLAS SAXPY timer time: 51 ms
+APPLE BLAS SAXPY timer time: 52 ms
+APPLE BLAS SAXPY timer time: 54 ms
+APPLE BLAS SAXPY timer time: 53 ms
+openBLAS SAXPY timer time: 51 ms
+openBLAS SAXPY timer time: 53 ms
+openBLAS SAXPY timer time: 53 ms
+openBLAS SAXPY timer time: 51 ms
+openBLAS SAXPY timer time: 51 ms
+openBLAS SAXPY timer time: 53 ms
+openBLAS SAXPY timer time: 53 ms
+openBLAS SAXPY timer time: 50 ms
+openBLAS SAXPY timer time: 53 ms
+openBLAS SAXPY timer time: 53 ms
+openBLAS SAXPY (no asm) timer time: 71 ms
+openBLAS SAXPY (no asm) timer time: 69 ms
+openBLAS SAXPY (no asm) timer time: 68 ms
+openBLAS SAXPY (no asm) timer time: 68 ms
+openBLAS SAXPY (no asm) timer time: 69 ms
+openBLAS SAXPY (no asm) timer time: 70 ms
+openBLAS SAXPY (no asm) timer time: 76 ms
+openBLAS SAXPY (no asm) timer time: 72 ms
+openBLAS SAXPY (no asm) timer time: 69 ms
+openBLAS SAXPY (no asm) timer time: 69 ms
+warmup timer time: 55 ms
+warmup timer time: 54 ms
+warmup timer time: 56 ms
+warmup timer time: 56 ms
+warmup timer time: 56 ms
+warmup timer time: 56 ms
+warmup timer time: 56 ms
+warmup timer time: 56 ms
+warmup timer time: 56 ms
+warmup timer time: 56 ms
+std::vector timer time: 56 ms
+std::vector timer time: 56 ms
+std::vector timer time: 56 ms
+std::vector timer time: 56 ms
+std::vector timer time: 57 ms
+std::vector timer time: 55 ms
+std::vector timer time: 56 ms
+std::vector timer time: 56 ms
+std::vector timer time: 56 ms
+std::vector timer time: 56 ms
+std::valarray timer time: 56 ms
+std::valarray timer time: 56 ms
+std::valarray timer time: 55 ms
+std::valarray timer time: 58 ms
+std::valarray timer time: 57 ms
+std::valarray timer time: 56 ms
+std::valarray timer time: 56 ms
+std::valarray timer time: 56 ms
+std::valarray timer time: 55 ms
+std::valarray timer time: 56 ms
