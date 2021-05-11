@@ -1,0 +1,41 @@
+w[v == 'a'] = v + w;
+T = int
+
+N: 10000000
+SIMD vex[mask] timer time: 6 ms
+valarray[mask] timer time: 55 ms
+std::vector[mask] timer time: 7 ms
+-------------------------------------
+
+N: 100000000
+SIMD vex[mask] timer time: 69 ms
+valarray[mask] timer time: 611 ms
+std::vector[mask] timer time: 91 ms
+-------------------------------------
+
+N: 1000000000
+SIMD vex[mask] timer time: 2723 ms
+valarray[mask] timer time: 25179 ms
+std::vector[mask] timer time: 3758 ms
+=====================================
+
+T = uint_8t
+N: 10000000
+SIMD vex[mask] timer time: 5 ms
+valarray[mask] timer time: 54 ms
+std::vector[mask] timer time: 8 ms
+
+
+N: 100000000
+SIMD vex[mask] timer time: 52 ms
+std::valarray[mask] timer time: 500 ms
+std::vector[mask] timer time: 92 ms
+
+
+N: 1000000000
+SIMD vex[mask] timer time: 510 ms
+valarray[mask] timer time: 13527 ms
+std::vector[mask] timer time: 1480 ms
+
+=====================================
+
