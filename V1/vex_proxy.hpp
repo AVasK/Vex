@@ -65,6 +65,7 @@ struct vex_op
     template <typename _T>
     operator Vex<_T> () const
     {
+        std::cerr << "Vex<_T> Conversion\n";
         Vex<_T> res( size() );
         for (size_t i=0; i<size(); ++i)
         {
@@ -198,7 +199,7 @@ struct VProxy {
        return load_avx(&vector[i]);
     }
 
-    Vex<T> const& vector;
+    Vex<T> const& __restrict__ vector;
 };
 
 

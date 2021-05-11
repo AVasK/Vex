@@ -25,6 +25,8 @@
 #include "simd_types.hpp"
 #include "simd_ops.hpp"
 
+#include <future>
+
 template <typename T>
 class Vex;
 
@@ -32,6 +34,34 @@ class Vex;
 // ===============================
 // ========== Addition ===========
 // ===============================
+
+template <typename T, class V1, class V2>
+void f_async_add(Vex<T> & res, V1 const& v1, V2 const& v2, size_t id, size_t n_threads, size_t stride, size_t n_regs)
+{
+    for (size_t j=id*stride; j < n_regs; j+= n_threads * stride)
+        for (size_t i=0; i < stride && i < n_regs; i += 1)
+        {
+            auto idx = i + j;
+            auto _r1 = v1.get_avx_reg(idx * avx_offset<T>::value);;
+            auto _r2 = v2.get_avx_reg(idx * avx_offset<T>::value);
+            auto _res = _r1 + _r2;
+            store_avx( &res[idx * avx_offset<T>::value], _res );
+        }
+}
+
+template <typename T, class V1, class V2>
+void f_async_mul(Vex<T> & res, V1 const& v1, V2 const& v2, size_t id, size_t n_threads, size_t stride, size_t n_regs)
+{
+    for (size_t j=id*stride; j < n_regs; j+= n_threads * stride)
+        for (size_t i=0; i < stride && i < n_regs; i += 1)
+        {
+            auto idx = i + j;
+            auto _r1 = v1.get_avx_reg(idx * avx_offset<T>::value);;
+            auto _r2 = v2.get_avx_reg(idx * avx_offset<T>::value);
+            auto _res = _r1 * _r2;
+            store_avx( &res[idx * avx_offset<T>::value], _res );
+        }
+}
 
 template <typename T, class V1, class V2>
 __attribute__((target("avx2")))
@@ -50,6 +80,12 @@ inline void add_avx (
         auto _res = _r1 + _r2;
         store_avx( &res[i * avx_offset<T>::value], _res );
     }
+    // auto f1 = std::async(&f_async_add<T, V1, V2>, std::ref(res), std::ref(v1), std::ref(v2), 0, 4, 128, n_regs);
+    // auto f2 = std::async(&f_async_add<T, V1, V2>, std::ref(res), std::ref(v1), std::ref(v2), 1, 4, 128, n_regs);
+    // auto f3 = std::async(&f_async_add<T, V1, V2>, std::ref(res), std::ref(v1), std::ref(v2), 2, 4, 128, n_regs);
+    // auto f4 = std::async(&f_async_add<T, V1, V2>, std::ref(res), std::ref(v1), std::ref(v2), 3, 4, 128, n_regs);
+
+    // f1.wait(); f2.wait(); f3.wait(); f4.wait();
 }
 
 

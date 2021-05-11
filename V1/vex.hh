@@ -36,13 +36,17 @@ template<typename Vexlike>
 func Vex<T>::operator+= (Vexlike const& other) 
 -> typename std::enable_if<std::is_same<T, typename Vexlike::value_type>::value, Vex&>::type
 {
+#ifdef __AVX2__
+    add_avx(*this, *this, other);
+#else
     if (simd_flags() & SIMD::AVX2) {
         add_avx(*this, *this, other);
     }
     // Add compile-time user-set-flags checking
-    else if (simd_flags() & SIMD::SSE2) {
+    else {
         add_sse(*this, *this, other);
     }
+#endif
     return *this;
 }
 
@@ -50,14 +54,18 @@ func Vex<T>::operator+= (Vexlike const& other)
 template<typename T>
 func Vex<T>::operator+= (T other) -> Vex<T>&
 {   
+#ifdef __AVX2__
+    addval_avx(*this, *this, other);
+#else
     if (simd_flags() & SIMD::AVX2) {
         // AVX2
         addval_avx(*this, *this, other);
     }
-    else if (simd_flags() & SIMD::SSE2) {
+    else {
         // SSE2
         addval_sse(*this, *this, other);
     }
+#endif
     return *this;
 }
 
@@ -75,7 +83,7 @@ func Vex<T>::operator-= (Vexlike const& other)
         sub_avx(*this, *this, other);
     }
     // Add compile-time user-set-flags checking
-    else if (simd_flags() & SIMD::SSE2) {
+    else {
         sub_sse(*this, *this, other);
     }
     return *this;
@@ -89,7 +97,7 @@ func Vex<T>::operator-= (T other) -> Vex<T>&
         // AVX2
         subval_avx(*this, *this, other);
     }
-    else if (simd_flags() & SIMD::SSE2) {
+    else {
         // SSE2
         subval_sse(*this, *this, other);
     }
@@ -110,7 +118,7 @@ func Vex<T>::operator*= (Vexlike const& other)
         mul_avx(*this, *this, other);
     }
     // Add compile-time user-set-flags checking
-    else if (simd_flags() & SIMD::SSE2) {
+    else {
         mul_sse(*this, *this, other);
     }
     return *this;
@@ -124,7 +132,7 @@ func Vex<T>::operator*= (T other) -> Vex<T>&
         // AVX2
         mulval_avx(*this, *this, other);
     }
-    else if (simd_flags() & SIMD::SSE2) {
+    else {
         // SSE2
         mulval_sse(*this, *this, other);
     }

@@ -158,6 +158,7 @@ public:
         used += 1;
     }
 
+
     T pop()
     {
         if (used < (capacity / 2)-8)
@@ -277,7 +278,7 @@ private:
     size_t capacity = 0;
     size_t used = 0;
 protected:
-    T* data = nullptr;
+    T * __restrict__ data = nullptr;
 };
 
 

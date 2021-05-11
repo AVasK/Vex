@@ -130,7 +130,6 @@ struct eval_op<'-'> {
     #ifdef __AVX__
         mul_avx(res, v1, v2);
     #else
-
         auto flags = simd_flags();
         if ( flags & SIMD::AVX )
         { 
@@ -153,7 +152,6 @@ struct eval_op<'*'> {
     #ifdef __AVX2__
         mul_avx(res, v1, v2);
     #else
-
         auto flags = simd_flags();
         if ( flags & SIMD::AVX2 )
         { 

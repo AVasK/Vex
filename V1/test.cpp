@@ -97,9 +97,9 @@ int main()
     arr[arr == 0] = 1 | otherwise(0); //flip
 
 
-    Vex<i32> res2 = vex1 + 2;
-    std::cout << vex1 << "\n";
-    std::cout << res2 << "\n";
+    // Vex<i32> res2 = vex1 + 2;
+    // std::cout << vex1 << "\n";
+    // std::cout << res2 << "\n";
 
 
     // Allowed Conversions:
