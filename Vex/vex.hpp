@@ -70,7 +70,6 @@ public:
     Vex(Vex<T2> const& other)
     : memory(other.size(), _alignment())
     {
-        std::cerr << "Vex<T2> -> Vex<T>\n";
         for (size_t i=0; i<other.size(); ++i)
         {
             memory[i] = static_cast<T>( other[i] );

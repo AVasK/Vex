@@ -68,9 +68,7 @@ struct Registers {
     , EBX {other.EBX}
     , ECX {other.ECX}
     , EDX {other.EDX}
-    {
-        std::cout << "regs copy c'ted\n";
-    }
+    { }
     
     Registers(UInt32 * other)
     : EAX {other[0]}
@@ -100,11 +98,10 @@ inline auto cpuid(unsigned i) -> Registers
 {
     Registers regs;
     
-    /* DOESN'T WORK WITH EXTENDED SUBLEAVES! @level7 AVX2 is NOT detected.
+    /* GCC's CPUID DOESN'T WORK WITH EXTENDED SUBLEAVES! @level7 AVX2 is NOT detected.
        ASSUMING THE PLAIN CPUID DOESN'T ZERO THE ECX.
      
     // GCC:
-    //TODO: TEST!
     #if C_GCC && defined(__get_cpuid)
         __get_cpuid(i, regs.EAX, regs.EBX, regs.ECX, regs.EDX);
         return regs;
@@ -117,7 +114,6 @@ inline auto cpuid(unsigned i) -> Registers
     #if C_MSVC || C_ICC
         __cpuidex((int *)regs, (int)i, 0/*ECX=0 for extended leaves*/);
     
-    // TODO: check clobbered registers again
     // x86_32:
     #elif ARCH_x86_32 && defined(__PIC__)
         asm volatile (

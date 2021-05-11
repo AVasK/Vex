@@ -76,7 +76,6 @@ public:
     template <typename V1, typename V2>
     void operator= (twofold<V1, V2> vals)
     {
-        std::cerr << "v[ ] = a | b\n";
         for (size_t i = 0; i < vex.size(); i++)
         {
             if (mask[i]) {
@@ -135,12 +134,6 @@ inline auto operator== (V1 const& vex, V2 const& v2) -> VMask<Comparator::EQ, wr
     return VMask<Comparator::EQ, wrap_t<V1>, wrap_t<V2>>(vex, v2);
 }
 
-// template <typename T>
-// auto operator== (Vex<T> const& vex, promote_t<T> val) -> VMask<bool, Vex<T>, Val<T>>
-// {  
-//     std::cerr << "VAL: " << val << "\n";
-//     return VMask<bool, Vex<T>, Val<T>>(vex, Val<T>(val));
-// }
 
 template <typename V>
 struct Otherwise {
@@ -161,7 +154,6 @@ auto otherwise (V const& v) -> Otherwise<V>
 
 template <typename V1, typename V2>
 struct twofold {
-    //static_assert(std::is_same<typename wrap_t<V1>::value_type, typename wrap_t<V2>::value_type>::value, "ERROR: value_types must be equal");
     
     explicit twofold (V1 const& _v1, V2 const& _v2)
     : v1 {_v1}

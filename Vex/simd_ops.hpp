@@ -21,6 +21,7 @@
 
 #pragma once 
 
+#include <iostream>
 #include "simd_types.hpp"
 #include "intrinsics.hpp" // cross-compiler/platform intrinsics header
 #include "x86_cpuid.hpp" // simd flags for the dynamic dispatch
