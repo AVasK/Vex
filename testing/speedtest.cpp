@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
     }
 
 
-    using T = u8;
+    using T = uint8_t;//u8;
         
     
     auto v = Vex<T>(N, 'a'); // [7] * 14
@@ -77,10 +77,6 @@ int main(int argc, char* argv[]) {
     std::cout << "# tests: " << n_tests << "\n";
     std::cout << "testing: v += 7*w;\nVex<T> res = v + w;" << "\n";
 
-    
-     
-    
-    
     
     {
         auto t = timing::msTimer("vector");
@@ -120,10 +116,12 @@ int main(int argc, char* argv[]) {
         w[v == T('a')] = v + w;
     }
 
+    #ifdef C_CLANG
     {
         auto t = timing::msTimer("valarray[mask]");
         wa[va == T('a')] = va + wa;
     }
+    #endif
 
     {
         auto t = timing::msTimer("std::vector[mask]");
