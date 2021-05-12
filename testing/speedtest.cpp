@@ -79,14 +79,7 @@ int main(int argc, char* argv[]) {
 
     
      
-    {
-        auto t = timing::msTimer("vex");
-        //v += w; // SIMD?
-        //v += 7;
-        //Vex<T> r = w + v*2;
-        v += 7*w;
-        Vex<T> res = v + w;
-    }
+    
     
     
     {
@@ -112,6 +105,14 @@ int main(int argc, char* argv[]) {
         //va += 7;
     }
     
+    {
+        auto t = timing::msTimer("vex");
+        //v += w; // SIMD?
+        //v += 7;
+        //Vex<T> r = w + v*2;
+        v += 7*w;
+        Vex<T> res = v + w;
+    }
     
     
     {

@@ -364,6 +364,18 @@ inline auto op< #_op_[0] > (T r1, T r2) -> T               \
     return r1 _op_ r2;                              \
 }
 
+#define DEF_AVX_OP(_op_, T)                         \
+                                                    \
+template <char>                                     \
+inline auto op (T, T) -> T;                         \
+                                                    \
+template<>                                          \
+__attribute__((target("avx2")))                     \
+inline auto op< #_op_[0] > (T r1, T r2) -> T        \
+{                                                   \
+    return r1 _op_ r2;                              \
+}
+
 
 // plain NON-SIMD case:
 DEF_OP(+, i8)
@@ -429,31 +441,31 @@ DEF_OP(/, sse_double)
 //////////////////////////
 // AVX
 
-DEF_OP(+, avx_float)
-DEF_OP(+, avx_double)
-DEF_OP(+, avx_i8)
-DEF_OP(+, avx_u8)
-DEF_OP(+, avx_i16)
-DEF_OP(+, avx_i32)
-DEF_OP(+, avx_i64)
+DEF_AVX_OP(+, avx_float)
+DEF_AVX_OP(+, avx_double)
+DEF_AVX_OP(+, avx_i8)
+DEF_AVX_OP(+, avx_u8)
+DEF_AVX_OP(+, avx_i16)
+DEF_AVX_OP(+, avx_i32)
+DEF_AVX_OP(+, avx_i64)
 
-DEF_OP(-, avx_float)
-DEF_OP(-, avx_double)
-DEF_OP(-, avx_i8)
-DEF_OP(-, avx_u8)
-DEF_OP(-, avx_i16)
-DEF_OP(-, avx_i32)
-DEF_OP(-, avx_i64)
+DEF_AVX_OP(-, avx_float)
+DEF_AVX_OP(-, avx_double)
+DEF_AVX_OP(-, avx_i8)
+DEF_AVX_OP(-, avx_u8)
+DEF_AVX_OP(-, avx_i16)
+DEF_AVX_OP(-, avx_i32)
+DEF_AVX_OP(-, avx_i64)
 
-DEF_OP(*, avx_float)
-DEF_OP(*, avx_double)
-DEF_OP(*, avx_i8)
-DEF_OP(*, avx_u8)
-DEF_OP(*, avx_i16)
-DEF_OP(*, avx_i32)
+DEF_AVX_OP(*, avx_float)
+DEF_AVX_OP(*, avx_double)
+DEF_AVX_OP(*, avx_i8)
+DEF_AVX_OP(*, avx_u8)
+DEF_AVX_OP(*, avx_i16)
+DEF_AVX_OP(*, avx_i32)
 
-DEF_OP(/, avx_float)
-DEF_OP(/, avx_double)
+DEF_AVX_OP(/, avx_float)
+DEF_AVX_OP(/, avx_double)
 
 
 #undef func

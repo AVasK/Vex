@@ -6,10 +6,10 @@ template <typename T>
 class Vex;
 
 template <typename T>
-class VProxy;
+struct VProxy;
 
 template <typename T>
-class Val;
+struct Val;
 
 
 template <typename T>
