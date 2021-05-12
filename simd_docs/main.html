@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SIMD Intrinsics</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+    
+<body>
+    <section id="intro">
+        <h1>
+            <b>SIMD</b> stands for <b>S</b>ingle <b>I</b>nstruction 
+            <b>M</b>ultiple <b>D</b>ata and lets your program make use 
+            of the vector instructions of your processor. <br/>
+        </h1>
+        
+        
+        <section id="headers">
+        #include <div class="include_tag">&lt;immintrin.h&gt;</div>
+        <div class="comment">works for most intrinsics, but not all</div> 
+        <br>
+            
+        #include <div class="include_tag">&lt;x86intrin.h&gt;</div> 
+        <wbr><div class="comment">includes ALL intrinsics, works in Clang & GCC compilers</div>
+        <br>
+            
+        #include <div class="include_tag">&lt;intrin.h&gt;</div> 
+        <wbr><div class="comment">includes ALL intrinsics, works in MSVC & ICC compilers</div>
+        <br>
+        
+        
+        </section>
+        
+        <br>
+        <h2>
+            SIMD instruction sets: 
+        </h2>
+        <ul>
+            <li><a href="#MMX">MMX</a></li>
+            <li><a href="#SSE">SSE</a></li>
+            <li>SSE2</li>
+            <li>SSE3</li>
+            <li>SSE4.1</li>
+            <li>SSE4.2</li>
+            <li><a href="#AVX">AVX</a></li>
+            <li>AVX2</li>
+            <li>AVX512</li>
+        </ul>
+        
+        <section id="MMX">
+            <h2>MMX:</h2>
+            <div class="brief">
+                A set of 64bit-wide registers <b>fused</b> with x87 FPU
+            </div>
+            <div class="register r64bits">
+                <div class="variable" id="i8">i8</div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+            </div>
+            
+            <div class="register r64bits">
+                <div class="variable" id="i16">i16</div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+            </div>
+            
+            <div class="register r64bits">
+                <div class="variable" id="i32">i32</div>
+                <div class="variable" id="i32"></div>
+            </div>
+            
+            <div class="register r64bits">
+                <div class="variable" id="i64">i64</div>
+            </div>
+            
+            <div class="register_size_line r64bits">
+            </div>
+            
+        </section>
+        
+        <section id="SSE">
+            <h2>SSE:</h2>
+            <div class="brief">
+                A set of 128bit-wide registers. The SSE standard adds 8 x 128-bit registers XMM0 - XMM7 { 16 XMM's (on x86-64) }.
+                XMM's are not aliased with x87 FPU unit, which means that switching between the SSE & the x87 FPU instructions
+                does not imply saving/restoring state information.
+            </div>
+            
+            <h3>Alignment:</h3>
+            16-byte aligned<br>
+            
+            <h3>Types for SSE:</h3>
+            <div class="tag">__m128i</div> -- a 128-bit vector of <u>integer</u><br>
+            <div class="tag">__m128</div> -- a 128-bit vector of <u>float</u><br>
+            <div class="tag">__m128d</div> -- a 128-bit vector of <u>double</u><br>
+            
+            
+            <div class="register r128bits">
+                <div class="variable" id="i8">i8</div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+            </div>
+            
+            <div class="register r128bits">
+                <div class="variable" id="i16">i16</div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+            </div>
+            
+            <div class="register r128bits">
+                <div class="variable" id="i32">i32</div>
+                <div class="variable" id="i32"></div>
+                <div class="variable" id="i32"></div>
+                <div class="variable" id="i32"></div>
+            </div>
+            
+            <div class="register r128bits">
+                <div class="variable" id="i64">i64</div>
+                <div class="variable" id="i64"></div>
+            </div>
+            
+            <div class="register_size_line r128bits">
+            </div>
+            
+        </section>
+        
+        <section id="AVX">
+            <h2>AVX:</h2>
+            <div class="brief">
+                A set of 256bit-wide registers, YMM.
+            </div>
+            
+            <h3>Alignment:</h3>
+            32-byte aligned<br>
+            
+            <h3>Types for AVX:</h3>
+            <div class="tag">__m256i</div> -- a 256-bit vector of <u>integer</u><br>
+            <div class="tag">__m256</div> -- a 256-bit vector of <u>float</u><br>
+            <div class="tag">__m256d</div> -- a 256-bit vector of <u>double</u><br>
+            
+            
+            <div class="register r256bits">
+                <div class="variable" id="i8">i8</div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+                <div class="variable" id="i8"></div>
+            </div>
+            
+            <div class="register r256bits">
+                <div class="variable" id="i16">i16</div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+                <div class="variable" id="i16"></div>
+            </div>
+            
+            <div class="register r256bits">
+                <div class="variable" id="i32">i32</div>
+                <div class="variable" id="i32"></div>
+                <div class="variable" id="i32"></div>
+                <div class="variable" id="i32"></div>
+                <div class="variable" id="i32"></div>
+                <div class="variable" id="i32"></div>
+                <div class="variable" id="i32"></div>
+                <div class="variable" id="i32"></div>
+            </div>
+            
+            <div class="register r256bits">
+                <div class="variable" id="i64">i64</div>
+                <div class="variable" id="i64"></div>
+                <div class="variable" id="i64"></div>
+                <div class="variable" id="i64"></div>
+            </div>
+            
+            <div class="register_size_line r256bits">
+            </div>
+            
+        </section>
+        
+    </section>
+</body>
+    
+</html>
