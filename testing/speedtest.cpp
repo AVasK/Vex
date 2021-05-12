@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
     }
 
 
-    using T = float;
+    using T = u8;
         
     
     auto v = Vex<T>(N, 'a'); // [7] * 14
@@ -70,82 +70,48 @@ int main(int argc, char* argv[]) {
     //rand_init(v, N);
     //rand_init(w, N);
 
-    int n_tests = 10;
-    int n_warmup = 5;
+    int n_tests = 1;
 
 
     std::cout << "N: " << N << "\n";
     std::cout << "# tests: " << n_tests << "\n";
-    std::cout << "testing: v += 7*w;" << "\n";
+    std::cout << "testing: v += 7*w;\nVex<T> res = v + w;" << "\n";
 
-    for (int k=0; k < 1; k++) {
-        for (int i=0; i<n_warmup; i++)
-        {
-            auto t = timing::msTimer("warmup");
-            //v += w; // SIMD?
-            //v += 7;
-            //Vex<T> r = w + v*2;
-            //v += 7*w;
-            //Vex<T> res = w + z + x;
-            Vex<T> res = v + w;
+    
+     
+    {
+        auto t = timing::msTimer("vex");
+        //v += w; // SIMD?
+        //v += 7;
+        //Vex<T> r = w + v*2;
+        v += 7*w;
+        Vex<T> res = v + w;
+    }
+    
+    
+    {
+        auto t = timing::msTimer("vector");
+        res = std::vector<T>(N);
+        for (size_t i=0; i<vv.size(); ++i) {
+            //vv[i] += vw[i];
+            //vv[i] += 7;
+            vv[i] += 7*vw[i];
+            res[i] = vv[i] + vw[i];
+            //res[i] = vw[i] + vv[i]*2;
+            //vv[i] += vw[i] + vz[i] + vx[i];
         }
+    }
+    
 
-        for (int i=0; i<n_tests; i++)
-        {
-            auto t = timing::msTimer("vex");
-            //v += w; // SIMD?
-            //v += 7;
-            //Vex<T> r = w + v*2;
-            //v += 7*w;
-            Vex<T> res = v + w;
-        }
-        
-        
-        //rand_init(vv, N);
-        //rand_init(vw, N);
-        for (int i=0; i<n_warmup/2; i++)
-        {
-            auto t = timing::msTimer("warmup");
-            res = std::vector<T>(N);
-            for (size_t i=0; i<vv.size(); ++i) {
-                res[i] = vv[i] + vw[i];
-            }
-        }
-
-        for (int i=0; i<n_tests; i++)
-        {
-            auto t = timing::msTimer("vector");
-            res = std::vector<T>(N);
-            for (size_t i=0; i<vv.size(); ++i) {
-                //vv[i] += vw[i];
-                //vv[i] += 7;
-                res[i] = vv[i] + vw[i];
-                //res[i] = vw[i] + vv[i]*2;
-                //vv[i] += vw[i] + vz[i] + vx[i];
-                //vv[i] += 7*vw[i];
-            }
-            //s += vv[0];
-        }
-        
-        //rand_init(va, N);
-        //rand_init(wa, N);
-        for (int i=0; i<n_warmup/2; i++)
-        {
-            auto t = timing::msTimer("warmup");
-            std::valarray<T> res = va + wa;
-        }
-
-        for (int i=0; i<n_tests; i++)
-        {
-            auto t = timing::msTimer("valarray");
-            //va += wa*7;
-            //std::valarray<T> res = wa + za + xa;
-            std::valarray<T> res = va + wa;
-            //va += wa;
-            //va += 7;
-        }
-    } 
-    //std::cout << s << "\n";
+    {
+        auto t = timing::msTimer("valarray");
+        va += wa*7;
+        //std::valarray<T> res = wa + za + xa;
+        std::valarray<T> res = va + wa;
+        //va += wa;
+        //va += 7;
+    }
+    
     
     
     {
